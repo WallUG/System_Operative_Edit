@@ -54,8 +54,14 @@ dkms.conf
 # debug information files
 *.dwo
 
-# Bootloader build artifacts
-boot/build/
-*.bin
-*.sys
-*.ld
+# Build directory
+build/
+
+# ISO files
+*.iso
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
