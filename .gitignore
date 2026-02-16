@@ -53,3 +53,9 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Bootloader build artifacts
+boot/build/
+*.bin
+*.sys
+*.ld
