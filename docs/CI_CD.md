@@ -23,7 +23,7 @@ Los siguientes artifacts se generan y están disponibles por 90 días:
 
 ### Cómo Descargar
 1. Ve a la pestaña "Actions" del repositorio
-2. Selecciona el workflow run más reciente exitoso (✓)
+2. Selecciona el workflow run más reciente con estado exitoso (indicado con una marca de verificación verde)
 3. Scroll hasta "Artifacts" al final de la página
 4. Click para descargar el ZIP
 5. Extrae el ISO y úsalo

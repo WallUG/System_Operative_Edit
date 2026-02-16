@@ -3,6 +3,7 @@ name: Build System Operative Edit
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
   workflow_dispatch:  # Permite ejecutar manualmente
@@ -190,7 +191,21 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### File Sizes" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        ls -lh system_operative_edit.iso build/kernel.elf boot/build/freeldr.sys 2>/dev/null || echo "Some files not found"
+        if [ -f system_operative_edit.iso ]; then
+          ls -lh system_operative_edit.iso >> $GITHUB_STEP_SUMMARY
+        else
+          echo "ISO file not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -f build/kernel.elf ]; then
+          ls -lh build/kernel.elf >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Kernel file not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -f boot/build/freeldr.sys ]; then
+          ls -lh boot/build/freeldr.sys >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Bootloader file not found" >> $GITHUB_STEP_SUMMARY
+        fi
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Download" >> $GITHUB_STEP_SUMMARY
