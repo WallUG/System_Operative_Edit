@@ -43,4 +43,8 @@ void VideoSetCursor(int x, int y);
 void VideoSetColor(u8 color);
 void VideoPutStringAt(int x, int y, const char *str);
 
+/* Funciones auxiliares para imprimir números */
+void VideoHexPrint(u32 value);
+void VideoDecPrint(u32 value);
+
 #endif /* _VIDEO_H */

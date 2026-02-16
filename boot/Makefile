@@ -10,7 +10,7 @@ LD = ld
 OBJCOPY = objcopy
 
 # Flags para el ensamblador
-ASFLAGS = --32
+ASFLAGS = --32 -I./include
 
 # Flags para el compilador C
 CFLAGS = -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib \
@@ -34,7 +34,16 @@ FREELDR_OBJS = $(BUILD_DIR)/freeldr.o $(BUILD_DIR)/video.o \
 
 # Target principal
 .PHONY: all
-all: directories bootsect freeldr
+all: directories freeldr
+	@echo ""
+	@echo "==========================================="
+	@echo "Compilación completada!"
+	@echo "==========================================="
+	@echo "FreeLoader compilado: build/freeldr.sys"
+	@echo ""
+	@echo "NOTA: Los boot sectors requieren el sistema de compilación de ReactOS"
+	@echo "Ver boot/bootsect/COMPILE_NOTE.md para más información"
+	@echo ""
 
 # Crear directorios de build
 .PHONY: directories

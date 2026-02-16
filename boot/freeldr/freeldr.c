@@ -28,48 +28,39 @@ extern void memcpy(void *dest, const void *src, int n);
 extern void memset(void *ptr, int value, int n);
 extern int memcmp(const void *s1, const void *s2, int n);
 
-/* Declaraciones de funciones auxiliares */
-extern void VideoHexPrint(u32 value);
-extern void VideoDecPrint(u32 value);
-
 /* Variables globales */
-static u8 boot_drive = 0;
-static u8 boot_partition = 0;
+u8 boot_drive = 0;
+u8 boot_partition = 0;
 
 /*
  * BootEntry - Punto de entrada desde el boot sector
  * 
- * El boot sector carga FreeLoader en 0000:F800 y salta aquí.
- * Los parámetros de arranque vienen en:
- *   DL = unidad de arranque
- *   DH = partición de arranque
- * 
- * Esta función está en Assembly y llama a BootMain
+ * Nota: Por simplicidad, este FreeLoader asume que arranca en modo protegido de 32 bits
+ * o que el boot sector ya realizó la transición.
  */
 __asm__(
-    ".code16\n"
+    ".code32\n"
     ".section .text.entry\n"
     ".globl _start\n"
     "_start:\n"
-    "    cli\n"                          // Deshabilitar interrupciones
-    "    xor %ax, %ax\n"                 // AX = 0
-    "    mov %ax, %ds\n"                 // DS = 0
-    "    mov %ax, %es\n"                 // ES = 0
-    "    mov %ax, %ss\n"                 // SS = 0
-    "    mov $0x7BF0, %sp\n"             // Configurar pila
-    "    sti\n"                          // Habilitar interrupciones
+    "    cli\n"
+    "    mov $0x10, %ax\n"
+    "    mov %ax, %ds\n"
+    "    mov %ax, %es\n"
+    "    mov %ax, %fs\n"
+    "    mov %ax, %gs\n"
+    "    mov %ax, %ss\n"
+    "    mov $0x7BF0, %esp\n"
+    "    sti\n"
     "    \n"
-    "    # Guardar parámetros de arranque\n"
-    "    movb %dl, boot_drive\n"         // Guardar unidad de arranque
-    "    movb %dh, boot_partition\n"     // Guardar partición
+    "    # Guardar parámetros (DL y DH pasados desde boot sector)\n"
+    "    movzbl %dl, %eax\n"
+    "    movb %al, boot_drive\n"
+    "    movzbl %dh, %eax\n"
+    "    movb %al, boot_partition\n"
     "    \n"
-    "    # Saltar a BootMain (código C)\n"
     "    call BootMain\n"
-    "    \n"
-    "    # Si BootMain retorna, entrar en halt\n"
     "    jmp Halt\n"
-    "\n"
-    ".code16\n"
 );
 
 /*
@@ -169,6 +160,10 @@ static void ShowNextSteps(void)
  */
 void BootMain(void)
 {
+    // Los parámetros están en la pila, pero por ahora usaremos valores por defecto
+    boot_drive = 0x80;  // Disco duro típico
+    boot_partition = 0;
+    
     // 1. Inicializar video
     VideoInit();
     
