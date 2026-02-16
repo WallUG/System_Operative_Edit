@@ -39,6 +39,25 @@ sudo apt-get install build-essential nasm cmake qemu-system-x86 \
 ./scripts/create-iso.sh
 ```
 
+## 🤖 Compilación Automática (CI/CD)
+
+Este proyecto incluye GitHub Actions para compilación automática.
+
+### Descargar ISO Pre-compilado
+
+1. Ve a [Actions](../../actions)
+2. Click en el workflow "Build System Operative Edit" más reciente exitoso
+3. Descarga el artifact "system-operative-edit-iso"
+4. Extrae el ZIP y obtén `system_operative_edit.iso`
+
+### Status del Build
+
+![Build Status](https://github.com/WallUG/System_Operative_Edit/workflows/Build%20System%20Operative%20Edit/badge.svg)
+
+Cada push a `main` compila automáticamente el sistema y genera un ISO descargable.
+
+Ver [docs/CI_CD.md](docs/CI_CD.md) para más detalles.
+
 ## Estructura del proyecto
 
 - `/boot` - Bootloader y código de arranque
