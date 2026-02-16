@@ -1,6 +1,9 @@
 ; boot.asm - Multiboot bootloader
 ; This bootloader is compatible with GRUB and follows the Multiboot specification
 
+; Set 32-bit mode
+BITS 32
+
 ; Multiboot header constants
 MULTIBOOT_MAGIC         equ 0x1BADB002
 MULTIBOOT_PAGE_ALIGN    equ 1 << 0
