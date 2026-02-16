@@ -100,23 +100,23 @@ $(BUILD_DIR)/freeldr.ld:
 	@echo "}" >> $@
 
 # Compilar archivos C de FreeLoader
-$(BUILD_DIR)/freeldr.o: $(FREELDR_DIR)/freeldr.c
+$(BUILD_DIR)/freeldr.o: $(FREELDR_DIR)/freeldr.c | directories
 	@echo "Compilando freeldr.c..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/video.o: $(FREELDR_DIR)/video.c
+$(BUILD_DIR)/video.o: $(FREELDR_DIR)/video.c | directories
 	@echo "Compilando video.c..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/memory.o: $(FREELDR_DIR)/memory.c
+$(BUILD_DIR)/memory.o: $(FREELDR_DIR)/memory.c | directories
 	@echo "Compilando memory.c..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/disk.o: $(FREELDR_DIR)/disk.c
+$(BUILD_DIR)/disk.o: $(FREELDR_DIR)/disk.c | directories
 	@echo "Compilando disk.c..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/string.o: $(FREELDR_DIR)/string.c
+$(BUILD_DIR)/string.o: $(FREELDR_DIR)/string.c | directories
 	@echo "Compilando string.c..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -183,4 +183,4 @@ info:
 	@echo "Flags de compilación:"
 	@echo "  ASFLAGS  = $(ASFLAGS)"
 	@echo "  CFLAGS   = $(CFLAGS)"
-	@echo "  LDFLAGS  = $(LDFLAGS)"
+	@echo "  LDFLAGS  = $(LDFLAGS)", 
