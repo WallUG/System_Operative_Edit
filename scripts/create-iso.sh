@@ -12,7 +12,7 @@ cp "$KERNEL" "$ISO_DIR/boot/"
 
 # Create grub.cfg
 cat > "$ISO_DIR/boot/grub/grub.cfg" << EOF
-set timeout=0
+set timeout=5
 set default=0
 
 menuentry "System Operative Edit" {
