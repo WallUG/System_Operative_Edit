@@ -14,4 +14,4 @@ qemu-system-i386 \
     -serial stdio \
     -display gtk
 
-# Para debugging agregar: -s -S
+# For debugging add: -s -S

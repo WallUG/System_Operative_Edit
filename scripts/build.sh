@@ -3,14 +3,14 @@ set -e
 
 echo "=== Building System Operative Edit ==="
 
-# Crear directorio build
+# Create build directory
 mkdir -p build
 cd build
 
-# Configurar con CMake
+# Configure with CMake
 cmake ..
 
-# Compilar
+# Compile
 make -j$(nproc)
 
 echo "=== Build complete! ==="

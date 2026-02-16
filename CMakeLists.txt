@@ -1,26 +1,26 @@
 cmake_minimum_required(VERSION 3.10)
 project(SystemOperativeEdit C ASM_NASM)
 
-# Configuración para cross-compilation
+# Cross-compilation configuration
 set(CMAKE_SYSTEM_NAME Generic)
 
-# Compiladores
+# Compilers
 set(CMAKE_C_COMPILER gcc)
 
-# Flags de compilación para kernel
+# Kernel compilation flags
 set(CMAKE_C_FLAGS "-m32 -ffreestanding -nostdlib -fno-builtin -fno-stack-protector -Wall -Wextra -O2")
 
-# Subdirectorios
+# Subdirectories
 add_subdirectory(kernel)
 
 # Linker script
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/linker.ld")
 
-# Boot assembly
+# Boot assembly source and object files
 set(BOOT_ASM_SOURCE "${CMAKE_SOURCE_DIR}/boot/boot.asm")
 set(BOOT_OBJECT "${CMAKE_BINARY_DIR}/boot.asm.o")
 
-# Compile boot.asm manually
+# Compile boot.asm manually because CMake's ASM_NASM support doesn't handle elf32 format correctly
 add_custom_command(
     OUTPUT ${BOOT_OBJECT}
     COMMAND nasm -f elf32 -o ${BOOT_OBJECT} ${BOOT_ASM_SOURCE}
@@ -28,7 +28,7 @@ add_custom_command(
     COMMENT "Assembling boot.asm"
 )
 
-# Target del kernel
+# Kernel target
 add_executable(kernel.elf
     ${BOOT_OBJECT}
     $<TARGET_OBJECTS:kernel>
