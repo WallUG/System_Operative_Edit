@@ -35,6 +35,6 @@ add_executable(kernel.elf
 )
 
 set_target_properties(kernel.elf PROPERTIES
-    LINK_FLAGS "-m32 -T ${LINKER_SCRIPT} -nostdlib -static -lgcc"
+    LINK_FLAGS "-m32 -T ${LINKER_SCRIPT} -nostdlib -static -lgcc -Wl,--build-id=none"
     LINK_DEPENDS ${LINKER_SCRIPT}
 )
