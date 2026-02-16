@@ -19,7 +19,7 @@ Sistema operativo basado en ReactOS para edición personalizada.
 ```bash
 sudo apt-get update
 sudo apt-get install build-essential nasm cmake qemu-system-x86 \
-                     grub-pc-bin xorriso gcc-multilib g++-multilib
+                     grub-pc-bin xorriso mtools gcc-multilib g++-multilib
 ```
 
 ## Compilación
