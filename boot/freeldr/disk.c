@@ -109,7 +109,7 @@ static int DiskReadSectorsLBA(u8 drive, u32 lba, u16 count, void *buffer)
     dap.reserved = 0;
     dap.count = count;
     dap.offset = (u16)((u32)buffer & 0xFFFF);
-    dap.segment = (u16)(((u32)buffer >> 4) & 0xF000);
+    dap.segment = (u16)((u32)buffer >> 4);
     dap.lba_low = lba;
     dap.lba_high = 0;
     
@@ -155,7 +155,7 @@ static int DiskReadSectorsCHS(u8 drive, u32 lba, u16 count, void *buffer)
     u16 ax, result_ax;
     
     // Calcular segmento:offset del buffer
-    u16 segment = (u16)(((u32)buffer >> 4) & 0xF000);
+    u16 segment = (u16)((u32)buffer >> 4);
     u16 offset = (u16)((u32)buffer & 0xFFFF);
     
     // INT 13h, AH=02h: Leer sectores

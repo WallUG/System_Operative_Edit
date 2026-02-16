@@ -16,7 +16,7 @@
 #include "include/video.h"
 
 /* Variables estáticas del módulo de video */
-static u16 *video_memory = (u16 *)VIDEO_BUFFER;
+static volatile u16 *video_memory = (volatile u16 *)VIDEO_BUFFER;
 static int cursor_x = 0;
 static int cursor_y = 0;
 static u8 current_color = MAKE_COLOR(COLOR_LIGHT_GRAY, COLOR_BLACK);

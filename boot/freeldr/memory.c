@@ -56,7 +56,7 @@ void MemoryGetMap(void)
             "int $0x15\n"
             : "=a"(signature), "=c"(bytes), "=b"(continuation)
             : "a"(0xE820), "b"(continuation), "c"(24), "d"(0x534D4150), "D"(e)
-            : "memory"
+            : "memory", "cc"
         );
         
         // Verificar si la llamada fue exitosa

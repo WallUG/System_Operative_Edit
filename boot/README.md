@@ -239,8 +239,8 @@ make help      # Muestra ayuda de targets
 ### Probar en QEMU
 
 ```bash
-# Crear imagen de disco vacía
-dd if=/dev/zero of=disk.img bs=1M count=10
+# Crear imagen de disco de 32MB (apropiada para FAT12/16)
+dd if=/dev/zero of=disk.img bs=1M count=32
 
 # Escribir boot sector
 dd if=build/fat.bin of=disk.img conv=notrunc

@@ -160,9 +160,14 @@ static void ShowNextSteps(void)
  */
 void BootMain(void)
 {
-    // Los parámetros están en la pila, pero por ahora usaremos valores por defecto
-    boot_drive = 0x80;  // Disco duro típico
-    boot_partition = 0;
+    // NOTA: En una implementación completa, el boot sector pasa los parámetros
+    // en DL (drive) y DH (partition). El código assembly los guarda en las
+    // variables globales boot_drive y boot_partition.
+    // Por ahora, si los valores no son válidos, usamos valores por defecto.
+    
+    if (boot_drive == 0) {
+        boot_drive = 0x80;  // Disco duro típico por defecto
+    }
     
     // 1. Inicializar video
     VideoInit();

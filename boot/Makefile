@@ -13,8 +13,8 @@ OBJCOPY = objcopy
 ASFLAGS = --32 -I./include
 
 # Flags para el compilador C
-CFLAGS = -m32 -ffreestanding -fno-pie -fno-stack-protector -nostdlib \
-         -Wall -Wextra -O2 -I./freeldr
+CFLAGS = -m32 -ffreestanding -fno-pie -fno-stack-protector -fno-builtin \
+         -nostdlib -Wall -Wextra -O2 -I./freeldr
 
 # Flags para el linker
 LDFLAGS = -m elf_i386 -nostdlib
