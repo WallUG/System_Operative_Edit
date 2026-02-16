@@ -53,3 +53,16 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Build directories
+build/
+iso/
+
+# ISO images
+*.iso
+*.img
+
+# Temporary files
+*~
+*.swp
+*.swo
