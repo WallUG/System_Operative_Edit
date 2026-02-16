@@ -51,3 +51,6 @@ start:
     cli
     hlt
     jmp .hang
+
+; Mark stack as non-executable (for security)
+section .note.GNU-stack noalloc noexec nowrite progbits
