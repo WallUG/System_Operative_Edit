@@ -38,4 +38,6 @@ struct multiboot_info {
     uint32_t mmap_addr;
 } __attribute__((packed));
 
+typedef struct multiboot_info multiboot_info_t;
+
 #endif /* _MULTIBOOT_H */
