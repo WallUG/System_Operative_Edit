@@ -3,7 +3,7 @@
  * Prevents Triple Faults by handling CPU exceptions
  */
 
-#include <stdint.h>
+#include "types.h"
 
 /* IDT Entry structure */
 struct idt_entry {
