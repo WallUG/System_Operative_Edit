@@ -2,6 +2,8 @@
 
 FreeLoader es el segundo stage del bootloader del sistema operativo. Es cargado por el boot sector y se encarga de inicializar el hardware, detectar memoria y preparar el entorno para el kernel.
 
+**NUEVO**: Ahora incluye animación de arranque con el logo de Universidad de Guayaquil. Ver [BOOT_ANIMATION.md](BOOT_ANIMATION.md) para detalles.
+
 ## Arquitectura
 
 FreeLoader es un bootloader simplificado escrito en C (con algunas partes en Assembly inline) diseñado para ser:
@@ -15,15 +17,17 @@ FreeLoader es un bootloader simplificado escrito en C (con algunas partes en Ass
 ```
 boot/freeldr/
 ├── freeldr.c         # Punto de entrada principal
+├── boot_animation.c  # Sistema de animación de arranque (NUEVO)
 ├── memory.c          # Gestión de memoria (INT 15h, E820)
 ├── disk.c            # Acceso a disco (INT 13h, LBA/CHS)
 ├── video.c           # Video en modo texto (VGA)
 ├── string.c          # Funciones de strings (sin libc)
 └── include/
-    ├── freeldr.h     # Definiciones principales
-    ├── memory.h      # Estructuras de memoria
-    ├── disk.h        # Estructuras de disco
-    └── video.h       # Funciones de video
+    ├── freeldr.h        # Definiciones principales
+    ├── boot_animation.h # API de animación (NUEVO)
+    ├── memory.h         # Estructuras de memoria
+    ├── disk.h           # Estructuras de disco
+    └── video.h          # Funciones de video
 ```
 
 ## Componentes
@@ -33,9 +37,25 @@ boot/freeldr/
 - **Función**: `BootMain()`
 - **Responsabilidades**:
   - Inicializar todos los subsistemas
+  - Mostrar animación de arranque con logo UG (NUEVO)
   - Mostrar información del sistema
   - Preparar el entorno para el kernel
   - Transferir control al kernel (fase futura)
+
+### boot_animation.c - Sistema de Animación (NUEVO)
+
+- **Modo**: Texto VGA 80x25
+- **Funciones**:
+  - `AnimationInit()` - Inicializa sistema de animación
+  - `AnimationShowLogo()` - Muestra logo UG en ASCII art
+  - `AnimationShowProgress()` - Barra de progreso animada
+  - `AnimationShowWelcome()` - Secuencia completa de bienvenida
+- **Características**:
+  - Logo Universidad de Guayaquil en ASCII art
+  - Colores institucionales (azul y amarillo)
+  - Animación de progreso con 5 etapas
+  - Transiciones suaves con delays
+- **Documentación**: Ver [BOOT_ANIMATION.md](BOOT_ANIMATION.md)
 
 ### video.c - Subsistema de Video
 
