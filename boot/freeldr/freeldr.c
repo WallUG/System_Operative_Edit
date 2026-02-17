@@ -20,6 +20,7 @@
 #include "include/memory.h"
 #include "include/disk.h"
 #include "include/boot_animation.h"
+#include "../include/hardware.h"
 
 /* Declaraciones de funciones externas (string.c) */
 extern int strlen(const char *str);
@@ -170,16 +171,32 @@ void BootMain(void)
         boot_drive = 0x80;  // Disco duro típico por defecto
     }
     
-    // 1. Inicializar video
+    // 1. Inicializar video en modo texto (siempre disponible como fallback)
     VideoInit();
     
-    // 2. Inicializar sistema de animación
-    AnimationInit();
+    // 2. Intentar inicializar modo gráfico para animación
+    int graphics_mode = HwInitBootGraphics();
     
-    // 3. Mostrar animación de bienvenida con logo UG
-    AnimationShowWelcome();
+    if (graphics_mode) {
+        // Modo gráfico disponible - usar animación gráfica
+        /* Importar funciones de UI de graphics (tienen nombres diferentes para evitar conflictos) */
+        extern int AnimationGraphicsInit(void);
+        extern void AnimationGraphicsShowWelcome(void);
+        extern void AnimationGraphicsCleanup(void);
+        
+        if (AnimationGraphicsInit()) {
+            AnimationGraphicsShowWelcome();
+            AnimationGraphicsCleanup();
+        }
+    } else {
+        // Fallback a animación en modo texto
+        AnimationInit();
+        AnimationShowWelcome();
+    }
     
-    // 4. Limpiar pantalla para mostrar información detallada
+    // 4. Restaurar modo texto y limpiar pantalla para mostrar información detallada
+    HwResetGraphics();
+    VideoInit();  // Re-inicializar modo texto
     VideoClearScreen();
     
     // 5. Mostrar banner de bienvenida tradicional
