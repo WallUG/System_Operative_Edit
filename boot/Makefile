@@ -30,7 +30,7 @@ BOOTSECTS = $(BUILD_DIR)/fat.bin $(BUILD_DIR)/fat32.bin $(BUILD_DIR)/isoboot.bin
 # Archivos objeto de FreeLoader
 FREELDR_OBJS = $(BUILD_DIR)/freeldr.o $(BUILD_DIR)/video.o \
                $(BUILD_DIR)/memory.o $(BUILD_DIR)/disk.o \
-               $(BUILD_DIR)/string.o
+               $(BUILD_DIR)/string.o $(BUILD_DIR)/boot_animation.o
 
 # Target principal
 .PHONY: all
@@ -118,6 +118,10 @@ $(BUILD_DIR)/disk.o: $(FREELDR_DIR)/disk.c | directories
 
 $(BUILD_DIR)/string.o: $(FREELDR_DIR)/string.c | directories
 	@echo "Compilando string.c..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/boot_animation.o: $(FREELDR_DIR)/boot_animation.c | directories
+	@echo "Compilando boot_animation.c..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Enlazar FreeLoader
