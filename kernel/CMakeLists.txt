@@ -3,6 +3,8 @@ add_library(kernel OBJECT
     screen.c
     hal/hal.c
     mm/mm.c
+    interrupt/gdt.c
+    interrupt/idt.c
     ../drivers/framework/io_manager.c
     ../drivers/framework/device.c
     ../drivers/hal/display.c

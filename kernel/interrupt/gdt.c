@@ -3,7 +3,7 @@
  * Ensures correct segmentation for protected mode
  */
 
-#include <stdint.h>
+#include "types.h"
 
 /* GDT Entry structure */
 struct gdt_entry {
