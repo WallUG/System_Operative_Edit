@@ -121,6 +121,21 @@ VOID VgaDrawLine(INT x1, INT y1, INT x2, INT y2, UCHAR Color);
 VOID VgaClearScreen(UCHAR Color);
 
 /**
+ * VgaDrawRect - Draw a rectangle outline
+ * @x: X coordinate of top-left corner
+ * @y: Y coordinate of top-left corner
+ * @width: Width of rectangle
+ * @height: Height of rectangle
+ * @Color: Border color (0-15)
+ */
+VOID VgaDrawRect(INT x, INT y, INT width, INT height, UCHAR Color);
+
+/**
+ * VgaDrawDemo - Draw a demo pattern to test VGA functionality
+ */
+VOID VgaDrawDemo(VOID);
+
+/**
  * VgaGetDeviceObject - Get VGA device object
  * 
  * Returns: Pointer to VGA device object or NULL

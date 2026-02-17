@@ -21,6 +21,7 @@ extern NTSTATUS IoInitSystem(void);
 extern NTSTATUS IoCreateDriver(PUNICODE_STRING, PDRIVER_INITIALIZE);
 extern NTSTATUS VgaDriverEntry(void*, PUNICODE_STRING);
 extern NTSTATUS HalInitializeDisplay(void);
+extern void VgaDrawDemo(void);
 
 void kernel_panic(const char* message)
 {
@@ -131,6 +132,23 @@ void kernel_main(uint32_t magic, struct multiboot_info* mboot)
     screen_writeln("");
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("Kernel initialized successfully!");
+    
+    /* Test VGA graphics mode if driver loaded successfully */
+    if (NT_SUCCESS(status)) {
+        screen_writeln("");
+        screen_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
+        screen_writeln("Testing VGA graphics mode...");
+        screen_writeln("Drawing demo pattern in 5 seconds...");
+        
+        /* Simple delay (very rough) */
+        for (volatile int i = 0; i < 50000000; i++);
+        
+        /* Draw VGA demo */
+        VgaDrawDemo();
+        
+        /* Note: After this, we're in graphics mode and can't use text mode anymore */
+        /* In a real implementation, we'd have a way to switch back or draw text in graphics mode */
+    }
 
     /* Halt system */
     screen_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
