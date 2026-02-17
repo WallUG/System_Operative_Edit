@@ -16,6 +16,9 @@
 #define NULL ((void*)0)
 #endif
 
+/* BMP file format constants */
+#define BMP_MAGIC 0x4D42  /* 'BM' signature */
+
 /* Estructura simplificada de encabezado BMP */
 typedef struct {
     unsigned short bfType;          /* 'BM' */
@@ -116,7 +119,7 @@ int BootLogoRender(const unsigned char *bitmap_data, unsigned int size)
     BMP_FILE_HEADER *file_header = (BMP_FILE_HEADER *)bitmap_data;
     
     /* Verificar firma BMP */
-    if (file_header->bfType != 0x4D42) { /* 'BM' */
+    if (file_header->bfType != BMP_MAGIC) { /* 'BM' */
         /* Si el BMP es inválido, usar logo embebido */
         draw_embedded_logo(center_x, center_y);
         return 1;

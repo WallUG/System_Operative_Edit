@@ -96,8 +96,9 @@ void BootVidClearScreen(unsigned char color)
     
     unsigned char *vga = VGA_MEMORY;
     int total_pixels = VGA_WIDTH * VGA_HEIGHT;
+    int i;
     
-    for (int i = 0; i < total_pixels; i++) {
+    for (i = 0; i < total_pixels; i++) {
         vga[i] = color;
     }
 }
@@ -126,10 +127,12 @@ void BootVidSetPixel(int x, int y, unsigned char color)
  */
 void BootVidDrawRect(int x, int y, int width, int height, unsigned char color)
 {
+    int dx, dy;
+    
     if (!graphics_mode_active) return;
     
-    for (int dy = 0; dy < height; dy++) {
-        for (int dx = 0; dx < width; dx++) {
+    for (dy = 0; dy < height; dy++) {
+        for (dx = 0; dx < width; dx++) {
             BootVidSetPixel(x + dx, y + dy, color);
         }
     }
@@ -140,16 +143,18 @@ void BootVidDrawRect(int x, int y, int width, int height, unsigned char color)
  */
 void BootVidDrawRectOutline(int x, int y, int width, int height, unsigned char color)
 {
+    int dx, dy;
+    
     if (!graphics_mode_active) return;
     
     /* Líneas horizontales */
-    for (int dx = 0; dx < width; dx++) {
+    for (dx = 0; dx < width; dx++) {
         BootVidSetPixel(x + dx, y, color);
         BootVidSetPixel(x + dx, y + height - 1, color);
     }
     
     /* Líneas verticales */
-    for (int dy = 0; dy < height; dy++) {
+    for (dy = 0; dy < height; dy++) {
         BootVidSetPixel(x, y + dy, color);
         BootVidSetPixel(x + width - 1, y + dy, color);
     }
@@ -241,13 +246,16 @@ void BootVidInitializePalette(void)
  */
 void BootVidFadeScreen(int fade_in, int steps)
 {
+    int i, step;
+    unsigned char r, g, b;
+    
     if (!graphics_mode_active) return;
     
     /* Guardar paleta original */
     unsigned char palette[256][3];
     
     /* Leer paleta actual */
-    for (int i = 0; i < 256; i++) {
+    for (i = 0; i < 256; i++) {
         /* Port 0x3C7: Palette Index (read) */
         /* Port 0x3C9: Palette Data */
         __asm__ volatile (
@@ -276,10 +284,8 @@ void BootVidFadeScreen(int fade_in, int steps)
     }
     
     /* Aplicar fade */
-    for (int step = 0; step < steps; step++) {
-        for (int i = 0; i < 256; i++) {
-            unsigned char r, g, b;
-            
+    for (step = 0; step < steps; step++) {
+        for (i = 0; i < 256; i++) {
             if (fade_in) {
                 /* Fade in: de negro a color original */
                 r = (palette[i][0] * step) / steps;
@@ -296,12 +302,15 @@ void BootVidFadeScreen(int fade_in, int steps)
         }
         
         /* Delay para hacer visible el efecto */
-        for (volatile int delay = 0; delay < 100000; delay++);
+        {
+            volatile int delay;
+            for (delay = 0; delay < 100000; delay++);
+        }
     }
     
     /* Restaurar paleta original al final del fade in */
     if (fade_in) {
-        for (int i = 0; i < 256; i++) {
+        for (i = 0; i < 256; i++) {
             BootVidSetPaletteColor(i, palette[i][0], palette[i][1], palette[i][2]);
         }
     }
