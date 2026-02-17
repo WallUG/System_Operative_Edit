@@ -19,10 +19,14 @@
 #include "include/boot_animation.h"
 
 /* Delay simple usando bucle ocupado (para animaciones) */
+/* NOTA: Este es un delay aproximado que varía según la velocidad del CPU.
+ * No es preciso y solo se usa para transiciones visuales.
+ * En hardware real, el tiempo puede variar significativamente.
+ */
 static void delay(u32 milliseconds)
 {
-    /* Aproximadamente 1ms por cada 50000 iteraciones en CPU moderna */
-    /* Ajustar según sea necesario */
+    /* Aproximadamente 1ms por cada 50000 iteraciones en CPU moderna típica */
+    /* Este valor es solo una estimación y puede requerir ajuste */
     volatile u32 count = milliseconds * 50000;
     while (count--) {
         __asm__ volatile ("nop");
@@ -91,10 +95,15 @@ void AnimationShowProgress(int step, const char *message)
 {
     const int total_steps = 5;
     const int bar_width = 40;
+    const int progress_msg_row = 18;
+    const int progress_bar_row = 19;
+    const int progress_col = 20;
+    
+    /* Calcular porción llena de la barra */
     int filled = (step * bar_width) / total_steps;
     
     /* Posicionar en parte inferior de la pantalla */
-    VideoSetCursor(20, 18);
+    VideoSetCursor(progress_col, progress_msg_row);
     
     /* Mostrar mensaje de progreso */
     VideoSetColor(MAKE_COLOR(COLOR_LIGHT_CYAN, COLOR_BLACK));
@@ -107,7 +116,7 @@ void AnimationShowProgress(int step, const char *message)
     }
     
     /* Mostrar barra de progreso */
-    VideoSetCursor(20, 19);
+    VideoSetCursor(progress_col, progress_bar_row);
     VideoSetColor(MAKE_COLOR(COLOR_LIGHT_GRAY, COLOR_BLACK));
     VideoPutString("  [");
     
@@ -174,13 +183,9 @@ void AnimationShowWelcome(void)
     AnimationShowProgress(4, "Preparando sistema...");
     delay(400);
     
-    AnimationShowProgress(5, "Listo!");
-    delay(600);
-    
-    /* Mensaje de transición */
-    VideoSetCursor(0, 21);
+    /* Mensaje de completitud */
+    VideoSetCursor(28, 21);
     VideoSetColor(MAKE_COLOR(COLOR_LIGHT_GREEN, COLOR_BLACK));
-    VideoPutString("\n                    Sistema iniciado correctamente!\n");
-    
-    delay(800);
+    VideoPutString("Listo - Sistema iniciado!");
+    delay(600);
 }

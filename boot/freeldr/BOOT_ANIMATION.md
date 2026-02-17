@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Sistema de animación de arranque que muestra el logo de la Universidad de Guayaquil (UG) durante el proceso de boot del sistema operativo. La animación se ejecuta en el segundo stage del bootloader (FreeLoader) antes de cargar el kernel.
+Sistema de animación de arranque que muestra el logo de la Universidad de Guayaquil (UG) durante el proceso de boot del sistema operativo. La animación se ejecuta en la segunda etapa del bootloader (FreeLoader) antes de cargar el kernel.
 
 ## Características
 
@@ -127,12 +127,15 @@ El logo utiliza ASCII art para representar "UG" de forma profesional:
 ## Características de Rendimiento
 
 - **Tamaño del módulo**: ~6KB compilado
-- **Tiempo de animación**: ~3.2 segundos total
+- **Tiempo de animación**: ~3.4 segundos total (aproximado, varía según CPU)
   - Logo display: 800ms
-  - Cada etapa de progreso: 400ms
+  - Mensaje inicial: 500ms
+  - Cada etapa de progreso: 400ms (x4 = 1600ms)
   - Mensaje final: 600ms
+  - Total: 3500ms = 3.5 segundos
 - **Uso de memoria**: Stack local únicamente, sin heap
 - **Sobrecarga CPU**: Mínima (delays con bucle busy-wait)
+- **Nota**: Los tiempos son aproximados y varían según la velocidad del CPU
 
 ## Compatibilidad
 
@@ -215,9 +218,11 @@ VideoSetColor(MAKE_COLOR(COLOR_WHITE, COLOR_BLACK));
 Editar delays en `boot_animation.c`:
 
 ```c
-delay(800);  // Duración del logo (ms)
-delay(400);  // Duración de cada etapa (ms)
+delay(800);  // Duración del logo (ms) - aproximado, varía según CPU
+delay(400);  // Duración de cada etapa (ms) - aproximado, varía según CPU
 ```
+
+**Nota importante**: Los delays son aproximados y varían significativamente según la velocidad del CPU. En hardware rápido serán más cortos, en hardware lento serán más largos. Para timing preciso se requeriría usar el PIT (Programmable Interval Timer).
 
 ### Modificar Logo
 
@@ -237,7 +242,7 @@ Modificar constante en `AnimationShowProgress()`:
 const int total_steps = 7;  // Cambiar de 5 a 7 etapas
 ```
 
-Y actualizar llamadas en `AnimationShowWelcome()`.
+Y actualizar llamadas en `AnimationShowWelcome()` para incluir más pasos (0-6 en lugar de 0-4).
 
 ## Pruebas
 
@@ -277,14 +282,17 @@ qemu-system-i386 -cdrom build/os.iso
 **Causa**: Modo VGA incorrecto o paleta modificada
 **Solución**: Asegurar que estamos en modo texto VGA estándar (mode 3)
 
-### Problema: Animación muy lenta
+### Problema: Animación muy lenta o muy rápida
 
-**Causa**: Delays muy largos o CPU muy lenta
+**Causa**: Delays basados en bucle ocupado varían con velocidad de CPU
 **Solución**: Ajustar multiplicador en función `delay()`:
 
 ```c
-volatile u32 count = milliseconds * 50000;  // Reducir multiplicador
+volatile u32 count = milliseconds * 50000;  // Reducir para CPUs rápidos, aumentar para lentos
+// Valores sugeridos: 25000 (CPU rápido), 50000 (normal), 100000 (CPU lento)
 ```
+
+**Nota**: Para timing preciso independiente del CPU, se requeriría implementar un driver del PIT (Programmable Interval Timer).
 
 ### Problema: Texto cortado
 
