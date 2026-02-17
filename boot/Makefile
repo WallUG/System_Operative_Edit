@@ -14,7 +14,7 @@ ASFLAGS = --32 -I./include
 
 # Flags para el compilador C
 CFLAGS = -m32 -ffreestanding -fno-pie -fno-stack-protector -fno-builtin \
-         -nostdlib -Wall -Wextra -O2 -I./freeldr
+         -nostdlib -Wall -Wextra -O2 -I./freeldr -I./include
 
 # Flags para el linker
 LDFLAGS = -m elf_i386 -nostdlib
@@ -30,7 +30,9 @@ BOOTSECTS = $(BUILD_DIR)/fat.bin $(BUILD_DIR)/fat32.bin $(BUILD_DIR)/isoboot.bin
 # Archivos objeto de FreeLoader
 FREELDR_OBJS = $(BUILD_DIR)/freeldr.o $(BUILD_DIR)/video.o \
                $(BUILD_DIR)/memory.o $(BUILD_DIR)/disk.o \
-               $(BUILD_DIR)/string.o $(BUILD_DIR)/boot_animation.o
+               $(BUILD_DIR)/string.o $(BUILD_DIR)/boot_animation.o \
+               $(BUILD_DIR)/bootvid.o $(BUILD_DIR)/bootlogo.o \
+               $(BUILD_DIR)/hardware.o $(BUILD_DIR)/animation.o
 
 # Target principal
 .PHONY: all
@@ -122,6 +124,22 @@ $(BUILD_DIR)/string.o: $(FREELDR_DIR)/string.c | directories
 
 $(BUILD_DIR)/boot_animation.o: $(FREELDR_DIR)/boot_animation.c | directories
 	@echo "Compilando boot_animation.c..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/bootvid.o: bootvid/bootvid.c | directories
+	@echo "Compilando bootvid.c..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/bootlogo.o: bootdata/bootlogo.c | directories
+	@echo "Compilando bootlogo.c..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/hardware.o: $(FREELDR_DIR)/arch/i386/hardware.c | directories
+	@echo "Compilando hardware.c..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/animation.o: $(FREELDR_DIR)/ui/animation.c | directories
+	@echo "Compilando animation.c (graphics)..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Enlazar FreeLoader
