@@ -19,6 +19,7 @@
 #include "include/video.h"
 #include "include/memory.h"
 #include "include/disk.h"
+#include "include/boot_animation.h"
 
 /* Declaraciones de funciones externas (string.c) */
 extern int strlen(const char *str);
@@ -172,25 +173,34 @@ void BootMain(void)
     // 1. Inicializar video
     VideoInit();
     
-    // 2. Mostrar banner de bienvenida
+    // 2. Inicializar sistema de animación
+    AnimationInit();
+    
+    // 3. Mostrar animación de bienvenida con logo UG
+    AnimationShowWelcome();
+    
+    // 4. Limpiar pantalla para mostrar información detallada
+    VideoClearScreen();
+    
+    // 5. Mostrar banner de bienvenida tradicional
     ShowWelcomeBanner();
     
-    // 3. Inicializar subsistema de memoria
+    // 6. Inicializar subsistema de memoria
     MemoryInit();
     
-    // 4. Inicializar subsistema de disco
+    // 7. Inicializar subsistema de disco
     DiskInit(boot_drive);
     
-    // 5. Mostrar información del sistema
+    // 8. Mostrar información del sistema
     ShowSystemInfo();
     
-    // 6. Mostrar estado
+    // 9. Mostrar estado
     ShowStatus();
     
-    // 7. Mostrar próximos pasos
+    // 10. Mostrar próximos pasos
     ShowNextSteps();
     
-    // 8. Mensaje final
+    // 11. Mensaje final
     VideoSetColor(MAKE_COLOR(COLOR_LIGHT_CYAN, COLOR_BLACK));
     VideoPutString("FreeLoader Phase 1 completado exitosamente.\n");
     VideoSetColor(MAKE_COLOR(COLOR_LIGHT_GRAY, COLOR_BLACK));
