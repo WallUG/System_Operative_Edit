@@ -6,6 +6,18 @@ Sistema operativo basado en ReactOS para edición personalizada.
 
 ## ✨ Features
 
+### Driver Framework (Fase 1)
+- **I/O Manager** - Sistema completo de registro y gestión de drivers (adaptado de ReactOS)
+  - Registro y descarga de drivers
+  - Gestión de objetos DEVICE_OBJECT y DRIVER_OBJECT
+  - Sistema básico de IRPs (I/O Request Packets)
+- **Driver VGA** - Driver de video VGA completo
+  - Modo texto 80×25 (compatibilidad actual)
+  - Modo gráfico VGA 640×480×16 colores
+  - Funciones de dibujado: pixel, líneas, rectángulos
+  - Gestión de paleta de colores de 16 bits
+- **HAL Display Support** - Abstracción de hardware para display
+
 ### Boot Animation
 - **Modo Gráfico VGA 13h** (320×200, 256 colores)
 - Logo de Universidad de Guayaquil con efectos fade in/out
@@ -82,10 +94,23 @@ Ver [docs/CI_CD.md](docs/CI_CD.md) para más detalles.
 - `/kernel` - Código del kernel
   - `/hal` - Hardware Abstraction Layer
   - `/mm` - Memory Manager
-  - `/io` - I/O Manager
-  - `/ps` - Process Manager
 - `/drivers` - Drivers de dispositivos
+  - `/framework` - I/O Manager framework (adaptado de ReactOS)
+    - `io_manager.c` - Registro y gestión de drivers
+    - `device.c` - Gestión de objetos de dispositivo
+  - `/video/vga` - Driver VGA completo
+    - `vga_driver.c` - Driver principal
+    - `vga_init.c` - Inicialización VGA
+    - `vga_screen.c` - Operaciones de pantalla
+    - `vga_operations.c` - Operaciones de dibujado
+    - `vga_hardware.c` - Acceso a hardware VGA
+  - `/hal` - HAL display support
 - `/include` - Headers compartidos
+  - `/drivers/ddk` - Driver Development Kit headers
+    - `wdm.h` - Windows Driver Model definitions
+    - `ntddk.h` - NT DDK essentials
+- `/lib` - Bibliotecas del kernel
+  - `memory.c` - Gestión de memoria (malloc, free, memset, etc.)
 - `/docs` - Documentación técnica
 - `/tools` - Herramientas de desarrollo
 - `/scripts` - Scripts de build y test
@@ -116,7 +141,17 @@ Si VGA no está disponible, verás:
 - [Boot Animation Text](boot/freeldr/BOOT_ANIMATION.md) - Modo texto fallback
 
 ### Kernel
-El kernel mostrará un mensaje de bienvenida con branding institucional:
+El kernel mostrará un mensaje de bienvenida con branding institucional y luego:
+1. Inicializa el HAL (Hardware Abstraction Layer)
+2. Inicializa el I/O Manager
+3. Carga el driver VGA en modo gráfico 640×480×16 colores
+4. Inicializa el HAL Display
+5. Dibuja un patrón de demostración con:
+   - Barras de colores (16 colores VGA)
+   - Rectángulos rellenos en colores primarios
+   - Líneas horizontales y diagonales
+   - Bordes alrededor de la pantalla
+
 ```
 ================================================================================
                        UNIVERSIDAD DE GUAYAQUIL
@@ -124,15 +159,43 @@ El kernel mostrará un mensaje de bienvenida con branding institucional:
                     Edicion Universidad de Guayaquil
                          Based on ReactOS
 ================================================================================
+Initializing HAL... OK
+Initializing I/O Manager... OK
+Loading VGA driver... OK
+Initializing HAL Display... OK
+Multiboot magic: Valid
+Memory lower: Available
+Memory upper: Available
+
 Kernel initialized successfully!
+
+Testing VGA graphics mode...
+Drawing demo pattern in 5 seconds...
+[Switches to VGA graphics mode with demo pattern]
 ```
 
 Ver documentación completa en [boot/freeldr/BOOT_ANIMATION.md](boot/freeldr/BOOT_ANIMATION.md).
 
 ## Próximos pasos
 
+### Driver Framework - Fase 2
+- [ ] Implementar driver de teclado PS/2
+- [ ] Implementar driver de mouse PS/2
+- [ ] Agregar más modos de video VGA
+- [ ] Implementar framebuffer manager
+- [ ] Agregar soporte para texto en modo gráfico
+
+### Kernel
 - [ ] Implementar gestión de memoria completa
 - [ ] Agregar manejo de interrupciones
 - [ ] Implementar scheduler de procesos
-- [ ] Agregar drivers básicos (teclado, mouse)
 - [ ] Implementar sistema de archivos
+
+## Créditos
+
+Este proyecto adapta componentes de ReactOS (GPL-3.0):
+- **I/O Manager**: Adaptado de `ntoskrnl/io/iomgr/` de ReactOS
+- **Driver VGA**: Adaptado de `win32ss/drivers/displays/vga/` de ReactOS
+- **HAL Display**: Adaptado de `hal/halx86/generic/display.c` de ReactOS
+
+Todos los archivos adaptados mantienen los créditos originales y respetan la licencia GPL-3.0.
