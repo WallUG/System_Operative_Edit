@@ -110,8 +110,10 @@ VOID VgaInitializePalette(VOID)
 /**
  * VgaSetWriteMode - Set VGA write mode
  * @Mode: Write mode (0-3)
+ * 
+ * Note: Reserved for future use. Will be needed for advanced drawing operations.
  */
-static VOID VgaSetWriteMode(UCHAR Mode)
+VOID VgaSetWriteMode(UCHAR Mode)
 {
     UCHAR value = VgaReadGraphicsController(5);
     value = (value & 0xFC) | (Mode & 0x03);
@@ -121,8 +123,10 @@ static VOID VgaSetWriteMode(UCHAR Mode)
 /**
  * VgaSelectPlane - Select VGA plane for writing
  * @Plane: Plane number (0-3)
+ * 
+ * Note: Reserved for future use. Will be needed for advanced drawing operations.
  */
-static VOID VgaSelectPlane(UCHAR Plane)
+VOID VgaSelectPlane(UCHAR Plane)
 {
     VgaWriteSequencer(2, 1 << Plane);
 }
@@ -130,8 +134,10 @@ static VOID VgaSelectPlane(UCHAR Plane)
 /**
  * VgaSetPlanesMask - Set VGA planes write mask
  * @Mask: Planes mask (bits 0-3)
+ * 
+ * Note: Reserved for future use. Will be needed for advanced drawing operations.
  */
-static VOID VgaSetPlanesMask(UCHAR Mask)
+VOID VgaSetPlanesMask(UCHAR Mask)
 {
     VgaWriteSequencer(2, Mask);
 }
@@ -139,8 +145,10 @@ static VOID VgaSetPlanesMask(UCHAR Mask)
 /**
  * VgaSetBitMask - Set VGA bit mask
  * @Mask: Bit mask
+ * 
+ * Note: Reserved for future use. Will be needed for advanced drawing operations.
  */
-static VOID VgaSetBitMask(UCHAR Mask)
+VOID VgaSetBitMask(UCHAR Mask)
 {
     VgaWriteGraphicsController(8, Mask);
 }

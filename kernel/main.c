@@ -83,10 +83,11 @@ void kernel_main(uint32_t magic, struct multiboot_info* mboot)
     screen_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
     screen_write("Loading VGA driver... ");
     UNICODE_STRING driverName;
+    /* String: "\Driver\VGA" = 11 characters */
     static const WCHAR driverNameStr[] = {'\\', 'D', 'r', 'i', 'v', 'e', 'r', '\\', 'V', 'G', 'A', 0};
     driverName.Buffer = (PWCHAR)driverNameStr;
-    driverName.Length = 10 * sizeof(WCHAR);
-    driverName.MaximumLength = 11 * sizeof(WCHAR);
+    driverName.Length = 11 * sizeof(WCHAR);      /* 11 characters (not counting null) */
+    driverName.MaximumLength = 12 * sizeof(WCHAR); /* 11 + 1 for null terminator */
     
     status = IoCreateDriver(&driverName, VgaDriverEntry);
     if (NT_SUCCESS(status)) {
@@ -140,7 +141,9 @@ void kernel_main(uint32_t magic, struct multiboot_info* mboot)
         screen_writeln("Testing VGA graphics mode...");
         screen_writeln("Drawing demo pattern in 5 seconds...");
         
-        /* Simple delay (very rough) */
+        /* Simple delay (very rough - CPU speed dependent) */
+        /* TODO: Implement proper timer-based delay mechanism */
+        /* This is a temporary placeholder until timer support is added */
         for (volatile int i = 0; i < 50000000; i++);
         
         /* Draw VGA demo */

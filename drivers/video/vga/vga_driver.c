@@ -50,11 +50,11 @@ NTSTATUS VgaDriverEntry(
     (VOID)RegistryPath;  /* Unused parameter */
     
     /* Create device name */
-    /* Note: Using L prefix for wide string literal */
+    /* String: "\Device\VGA" = 11 characters */
     static const WCHAR deviceNameStr[] = {'\\', 'D', 'e', 'v', 'i', 'c', 'e', '\\', 'V', 'G', 'A', 0};
     DeviceName.Buffer = (PWCHAR)deviceNameStr;
-    DeviceName.Length = 10 * sizeof(WCHAR);
-    DeviceName.MaximumLength = 11 * sizeof(WCHAR);
+    DeviceName.Length = 11 * sizeof(WCHAR);      /* 11 characters (not counting null) */
+    DeviceName.MaximumLength = 12 * sizeof(WCHAR); /* 11 + 1 for null terminator */
     
     /* Create device */
     Status = IoCreateDevice(

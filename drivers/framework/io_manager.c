@@ -128,6 +128,54 @@ VOID IoDeleteDriver(
 }
 
 /**
+ * RtlCompareUnicodeString - Compare two UNICODE_STRING structures
+ * @String1: First string
+ * @String2: Second string
+ * @CaseInSensitive: TRUE for case-insensitive comparison
+ * 
+ * Returns: 0 if equal, <0 if String1 < String2, >0 if String1 > String2
+ */
+static int RtlCompareUnicodeString(
+    PCUNICODE_STRING String1,
+    PCUNICODE_STRING String2,
+    BOOLEAN CaseInSensitive
+)
+{
+    size_t len1, len2, minlen, i;
+    WCHAR c1, c2;
+    
+    (VOID)CaseInSensitive; /* Not implemented yet */
+    
+    if (!String1 || !String2) {
+        return (String1 == String2) ? 0 : (String1 ? 1 : -1);
+    }
+    
+    if (!String1->Buffer || !String2->Buffer) {
+        return (String1->Buffer == String2->Buffer) ? 0 : (String1->Buffer ? 1 : -1);
+    }
+    
+    len1 = String1->Length / sizeof(WCHAR);
+    len2 = String2->Length / sizeof(WCHAR);
+    minlen = (len1 < len2) ? len1 : len2;
+    
+    /* Compare character by character */
+    for (i = 0; i < minlen; i++) {
+        c1 = String1->Buffer[i];
+        c2 = String2->Buffer[i];
+        
+        if (c1 != c2) {
+            return (c1 < c2) ? -1 : 1;
+        }
+    }
+    
+    /* If all compared characters match, the shorter string is "less" */
+    if (len1 == len2) {
+        return 0;
+    }
+    return (len1 < len2) ? -1 : 1;
+}
+
+/**
  * IoGetDeviceObjectPointer - Get pointer to device object
  * @DeviceName: Name of device
  * @DesiredAccess: Access rights
@@ -146,6 +194,8 @@ NTSTATUS IoGetDeviceObjectPointer(
     PDRIVER_OBJECT Driver;
     PDEVICE_OBJECT Device;
     
+    (VOID)DesiredAccess; /* Not used in this implementation */
+    
     if (!DeviceName || !DeviceObject) {
         return STATUS_INVALID_PARAMETER;
     }
@@ -155,14 +205,16 @@ NTSTATUS IoGetDeviceObjectPointer(
     while (Driver) {
         Device = Driver->DeviceObject;
         while (Device) {
-            /* Simple comparison - in real system would use proper string compare */
+            /* Compare device names */
             if (Device->DeviceName.Buffer && DeviceName->Buffer) {
-                /* Found device */
-                *DeviceObject = Device;
-                if (FileObject) {
-                    *FileObject = NULL; /* Not implemented */
+                if (RtlCompareUnicodeString(&Device->DeviceName, DeviceName, FALSE) == 0) {
+                    /* Found matching device */
+                    *DeviceObject = Device;
+                    if (FileObject) {
+                        *FileObject = NULL; /* File objects not implemented yet */
+                    }
+                    return STATUS_SUCCESS;
                 }
-                return STATUS_SUCCESS;
             }
             Device = Device->NextDevice;
         }

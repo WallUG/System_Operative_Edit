@@ -42,13 +42,20 @@ void *malloc(size_t size)
  * free - Free allocated memory
  * @ptr: Pointer to memory to free
  * 
- * Note: This is a simple implementation that doesn't actually free memory
- * A real implementation would use a proper allocator (e.g., buddy system)
+ * Note: LIMITATION - This is a simple bump allocator implementation.
+ * Memory is NOT actually freed or reused. This will lead to memory exhaustion
+ * over time as allocations accumulate. A proper allocator (buddy system,
+ * slab allocator, etc.) should be implemented for production use.
+ * 
+ * For Phase 1, this is acceptable since:
+ * - Drivers are loaded once at boot
+ * - Device objects persist for system lifetime
+ * - Limited dynamic allocation occurs after initialization
  */
 void free(void *ptr)
 {
-    /* Simple implementation - just ignore free for now */
-    /* In a real implementation, we would track allocations and reuse memory */
+    /* Simple bump allocator - memory is never actually freed */
+    /* TODO: Implement proper free list or buddy allocator */
     (void)ptr;
 }
 
