@@ -1,0 +1,183 @@
+================================================================================
+                    BOOT ANIMATION SCREENSHOT
+                    Universidad de Guayaquil Edition
+================================================================================
+
+This file shows a text representation of the boot animation as it appears
+during system startup. The actual display uses VGA text mode colors.
+
+================================================================================
+FRAME 1: Logo Display (~800ms)
+================================================================================
+
+[Background: Black, Text colors: Cyan, Yellow, White, Gray]
+
+
+                    ========================================
+                             _    _    _____  
+                            | |  | |  / ____| 
+                            | |  | | | |  __  
+                            | |  | | | | |_ | 
+                            | |__| | | |__| | 
+                             \____/   \_____| 
+                    ========================================
+
+                       UNIVERSIDAD DE GUAYAQUIL
+                       System Operative Edit v0.1
+                       Edicion Universidad de Guayaquil
+                    ========================================
+
+
+
+                        Iniciando sistema...
+
+
+
+
+
+================================================================================
+
+================================================================================
+FRAME 2: Progress Stage 1 (~400ms)
+================================================================================
+
+[Same logo as above, with progress bar at bottom]
+
+
+                    ========================================
+                             _    _    _____  
+                            | |  | |  / ____| 
+                            | |  | | | |  __  
+                            | |  | | | | |_ | 
+                            | |__| | | |__| | 
+                             \____/   \_____| 
+                    ========================================
+
+                       UNIVERSIDAD DE GUAYAQUIL
+                       System Operative Edit v0.1
+                       Edicion Universidad de Guayaquil
+                    ========================================
+
+
+
+                        Iniciando sistema...
+
+
+  Inicializando hardware...
+  [========>-------------------------------]  20%
+
+
+================================================================================
+
+================================================================================
+FRAME 3: Progress Stage 2 (~400ms)
+================================================================================
+
+  Detectando memoria...
+  [================>-----------------------]  40%
+
+================================================================================
+
+================================================================================
+FRAME 4: Progress Stage 3 (~400ms)
+================================================================================
+
+  Inicializando video...
+  [========================>---------------]  60%
+
+================================================================================
+
+================================================================================
+FRAME 5: Progress Stage 4 (~400ms)
+================================================================================
+
+  Configurando disco...
+  [================================>-------]  80%
+
+================================================================================
+
+================================================================================
+FRAME 6: Completion (~600ms)
+================================================================================
+
+  Preparando sistema...
+  [========================================]  100%
+
+                    Listo - Sistema iniciado!
+
+================================================================================
+
+================================================================================
+TRANSITION: Screen clears, shows traditional FreeLoader info
+================================================================================
+
+
+  ========================================
+      FreeLoader - System Operative Edit
+  ========================================
+
+Informacion del Sistema:
+------------------------
+
+  Unidad de arranque: 0x80
+  Particion: 0
+
+Memoria Detectada:
+------------------
+
+  Memoria baja:  640 KB
+  Memoria alta:  65536 KB
+  Total:         66176 KB (64 MB)
+
+Estado del Bootloader:
+----------------------
+
+  [OK] Video inicializado
+  [OK] Memoria detectada
+  [OK] Disco inicializado
+  [OK] Sistema listo
+
+[continues...]
+
+
+================================================================================
+
+COLOR LEGEND (VGA Text Mode):
+================================================================================
+
+Logo "UG" letters      : Yellow (bright)
+Separator lines        : Cyan (light)
+University name        : White (bright)
+Version info           : Gray (light)
+Progress bar (filled)  : Green (light)
+Progress bar (active)  : Yellow (bright) - the ">" indicator
+Progress bar (empty)   : Gray (dark)
+Status messages        : Gray (light)
+Success messages       : Green (light)
+
+================================================================================
+
+TECHNICAL DETAILS:
+================================================================================
+
+Total Animation Time : ~3.5 seconds (approximate, CPU-dependent)
+Screen Mode         : VGA Text Mode 80x25
+Memory Used         : ~2.3KB (stack only)
+Files Added         : 2 (boot_animation.c, boot_animation.h)
+Lines of Code       : ~200 lines (implementation + API)
+Documentation       : ~1500 lines (3 markdown files)
+
+================================================================================
+
+INSTITUCIONAL COLORS (Universidad de Guayaquil):
+================================================================================
+
+Primary   : Blue/Cyan  (represented as Light Cyan in VGA)
+Secondary : Yellow     (represented as Bright Yellow in VGA)
+
+These colors are used consistently throughout the boot animation to
+represent the institutional identity of Universidad de Guayaquil.
+
+================================================================================
+                              END OF SCREENSHOT
+================================================================================

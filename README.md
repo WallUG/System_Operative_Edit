@@ -2,6 +2,8 @@
 
 Sistema operativo basado en ReactOS para edición personalizada.
 
+**Edición Universidad de Guayaquil** - Ahora con animación de arranque profesional featuring el logo institucional UG. Ver [BOOT_ANIMATION_IMPLEMENTATION.md](BOOT_ANIMATION_IMPLEMENTATION.md) para detalles.
+
 ## Requisitos
 
 ### Herramientas de compilación:
@@ -54,12 +56,28 @@ sudo apt-get install build-essential nasm cmake qemu-system-x86 \
 
 ## Testing
 
-El kernel mostrará un mensaje de bienvenida al arrancar:
+El sistema ahora incluye una animación de arranque profesional con el logo de Universidad de Guayaquil.
+
+### Bootloader
+Al arrancar, verás:
+- Logo "UG" en ASCII art con colores institucionales
+- Barra de progreso animada con 5 etapas
+- Branding "UNIVERSIDAD DE GUAYAQUIL"
+- Transiciones suaves durante ~3.5 segundos
+
+### Kernel
+El kernel mostrará un mensaje de bienvenida con branding institucional:
 ```
-System Operative Edit v0.1
-Based on ReactOS
+================================================================================
+                       UNIVERSIDAD DE GUAYAQUIL
+                    System Operative Edit v0.1
+                    Edicion Universidad de Guayaquil
+                         Based on ReactOS
+================================================================================
 Kernel initialized successfully!
 ```
+
+Ver documentación completa en [boot/freeldr/BOOT_ANIMATION.md](boot/freeldr/BOOT_ANIMATION.md).
 
 ## Próximos pasos
 
