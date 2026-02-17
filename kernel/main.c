@@ -3,6 +3,25 @@
 #include "hal.h"
 #include "multiboot.h"
 
+/* Forward declarations for driver types */
+typedef int32_t NTSTATUS;
+typedef uint32_t ULONG;
+typedef unsigned short WCHAR;
+typedef WCHAR *PWCHAR;
+typedef struct _UNICODE_STRING {
+    uint16_t Length;
+    uint16_t MaximumLength;
+    PWCHAR Buffer;
+} UNICODE_STRING, *PUNICODE_STRING;
+typedef NTSTATUS (*PDRIVER_INITIALIZE)(void*, PUNICODE_STRING);
+#define NT_SUCCESS(Status) ((NTSTATUS)(Status) >= 0)
+
+/* Driver functions */
+extern NTSTATUS IoInitSystem(void);
+extern NTSTATUS IoCreateDriver(PUNICODE_STRING, PDRIVER_INITIALIZE);
+extern NTSTATUS VgaDriverEntry(void*, PUNICODE_STRING);
+extern NTSTATUS HalInitializeDisplay(void);
+
 void kernel_panic(const char* message)
 {
     screen_set_color(VGA_COLOR_WHITE, VGA_COLOR_RED);
@@ -46,6 +65,47 @@ void kernel_main(uint32_t magic, struct multiboot_info* mboot)
     hal_init();
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("OK");
+
+    /* Initialize I/O Manager */
+    screen_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    screen_write("Initializing I/O Manager... ");
+    NTSTATUS status = IoInitSystem();
+    if (NT_SUCCESS(status)) {
+        screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+        screen_writeln("OK");
+    } else {
+        screen_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+        screen_writeln("FAILED");
+    }
+
+    /* Load VGA driver */
+    screen_set_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    screen_write("Loading VGA driver... ");
+    UNICODE_STRING driverName;
+    static const WCHAR driverNameStr[] = {'\\', 'D', 'r', 'i', 'v', 'e', 'r', '\\', 'V', 'G', 'A', 0};
+    driverName.Buffer = (PWCHAR)driverNameStr;
+    driverName.Length = 10 * sizeof(WCHAR);
+    driverName.MaximumLength = 11 * sizeof(WCHAR);
+    
+    status = IoCreateDriver(&driverName, VgaDriverEntry);
+    if (NT_SUCCESS(status)) {
+        screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+        screen_writeln("OK");
+        
+        /* Initialize HAL display */
+        screen_write("Initializing HAL Display... ");
+        status = HalInitializeDisplay();
+        if (NT_SUCCESS(status)) {
+            screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+            screen_writeln("OK");
+        } else {
+            screen_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+            screen_writeln("FAILED");
+        }
+    } else {
+        screen_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+        screen_writeln("FAILED");
+    }
 
     /* Verify multiboot */
     screen_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
