@@ -2,7 +2,18 @@
 
 Sistema operativo basado en ReactOS para edición personalizada.
 
-**Edición Universidad de Guayaquil** - Ahora con animación de arranque profesional featuring el logo institucional UG. Ver [BOOT_ANIMATION_IMPLEMENTATION.md](BOOT_ANIMATION_IMPLEMENTATION.md) para detalles.
+**Edición Universidad de Guayaquil** - Ahora con animación de arranque profesional en modo gráfico VGA featuring el logo institucional UG.
+
+## ✨ Features
+
+### Boot Animation
+- **Modo Gráfico VGA 13h** (320×200, 256 colores)
+- Logo de Universidad de Guayaquil con efectos fade in/out
+- Barra de progreso animada
+- **Fallback automático** a modo texto ASCII si VGA falla
+- Paleta de colores institucionales
+
+Ver [docs/BOOT_ANIMATION_GRAPHICS.md](docs/BOOT_ANIMATION_GRAPHICS.md) para detalles técnicos.
 
 ## Requisitos
 
@@ -63,6 +74,11 @@ Ver [docs/CI_CD.md](docs/CI_CD.md) para más detalles.
 ## Estructura del proyecto
 
 - `/boot` - Bootloader y código de arranque
+  - `/bootvid` - Driver de video VGA para boot
+  - `/bootdata` - Assets y datos de boot (logos, etc.)
+  - `/freeldr` - FreeLoader (segundo stage bootloader)
+    - `/arch/i386` - Código específico de arquitectura
+    - `/ui` - UI y animaciones gráficas
 - `/kernel` - Código del kernel
   - `/hal` - Hardware Abstraction Layer
   - `/mm` - Memory Manager
@@ -70,19 +86,34 @@ Ver [docs/CI_CD.md](docs/CI_CD.md) para más detalles.
   - `/ps` - Process Manager
 - `/drivers` - Drivers de dispositivos
 - `/include` - Headers compartidos
+- `/docs` - Documentación técnica
 - `/tools` - Herramientas de desarrollo
 - `/scripts` - Scripts de build y test
 
 ## Testing
 
-El sistema ahora incluye una animación de arranque profesional con el logo de Universidad de Guayaquil.
+El sistema ahora incluye una animación de arranque profesional con el logo de Universidad de Guayaquil en modo gráfico VGA.
 
-### Bootloader
-Al arrancar, verás:
-- Logo "UG" en ASCII art con colores institucionales
-- Barra de progreso animada con 5 etapas
-- Branding "UNIVERSIDAD DE GUAYAQUIL"
-- Transiciones suaves durante ~3.5 segundos
+### Bootloader - Modo Gráfico (Primario)
+Al arrancar con soporte VGA, verás:
+- **Modo VGA 13h** (320×200, 256 colores)
+- Logo "UG" renderizado con geometría en colores institucionales
+- Efecto **fade-in** suave usando manipulación de paleta
+- Barra de progreso gráfica verde con 5 etapas
+- Branding "UNIVERSIDAD DE GUAYAQUIL" con líneas decorativas
+- Efecto **fade-out** antes de pasar al kernel
+- Duración: ~4.6 segundos
+
+### Bootloader - Modo Texto (Fallback)
+Si VGA no está disponible, verás:
+- Logo "UG" en ASCII art con colores VGA de texto
+- Barra de progreso con caracteres `=`, `>`, `-`
+- Branding institucional
+- Duración: ~3.5 segundos
+
+### Documentación Completa
+- [Boot Animation Graphics](docs/BOOT_ANIMATION_GRAPHICS.md) - Modo gráfico VGA
+- [Boot Animation Text](boot/freeldr/BOOT_ANIMATION.md) - Modo texto fallback
 
 ### Kernel
 El kernel mostrará un mensaje de bienvenida con branding institucional:
