@@ -16,14 +16,68 @@
 #define NULL ((void*)0)
 #endif
 
-/* Delay simple usando bucle ocupado */
+/*
+ * animation_delay - Espera precisa usando BIOS Wait Service
+ * 
+ * Usa INT 15h AH=86h (BIOS Wait Service) para timing preciso basado en hardware.
+ * Este método usa el PIT (Programmable Interval Timer) del sistema, proporcionando
+ * delays consistentes independientemente de la velocidad del CPU.
+ * 
+ * @milliseconds: Tiempo a esperar en milisegundos
+ * 
+ * BIOS INT 15h, AH=86h: Wait
+ * Entrada:
+ *   AH = 86h
+ *   CX:DX = Intervalo en microsegundos (32-bit: CX=high word, DX=low word)
+ * 
+ * Ventajas sobre busy-wait loop:
+ * - Timing preciso independiente de CPU
+ * - Usa hardware PIT timer
+ * - Funciona consistentemente en emuladores (VirtualBox, QEMU)
+ * - Soluciona problemas de sincronización VGA
+ * 
+ * Soluciona: Barras de colores aleatorias durante boot en emuladores
+ * debido a timing insuficiente en inicialización de modo VGA
+ */
 static void animation_delay(unsigned int milliseconds)
 {
-    /* Aproximadamente 1ms por cada 50000 iteraciones en CPU moderna típica */
-    volatile unsigned int count = milliseconds * 50000;
-    while (count--) {
-        __asm__ volatile ("nop");
+    unsigned long microseconds;
+    unsigned int cx, dx;
+    
+    /*
+     * Limitar a 65535 ms (~65 segundos) para prevenir overflow
+     * BIOS INT 15h AH=86h típicamente soporta hasta ~1 segundo,
+     * pero algunos implementan hasta ~65 segundos (CX:DX máximo)
+     * Nota: 65535 * 1000 = 65,535,000 que cabe en unsigned long 32-bit (max: 4,294,967,295)
+     */
+    if (milliseconds > 65535) {
+        milliseconds = 65535;
     }
+    
+    microseconds = milliseconds * 1000UL;  /* Safe: max 65,535,000 < 2^32 */
+    cx = (microseconds >> 16) & 0xFFFF;    /* High word: bits 31-16 */
+    dx = microseconds & 0xFFFF;            /* Low word: bits 15-0 */
+    /* CX:DX forma un valor 32-bit: 65,535,000 = 0x03E7FBE8 → CX=0x03E7, DX=0xFBE8 */
+    
+    /*
+     * INT 15h, AH=86h: Wait (BIOS Wait Service)
+     * Este servicio usa el hardware PIT para timing preciso.
+     * Es el método estándar usado por ReactOS, GRUB y otros bootloaders.
+     */
+    __asm__ volatile (
+        "int $0x15"
+        :                                    /* No output */
+        : "a"(0x8600), "c"(cx), "d"(dx)     /* Input: AH=86h, CX:DX=microseconds */
+        : "cc", "memory"                     /* Clobbers: flags, memory barrier */
+    );
+    
+    /*
+     * Nota: No hay fallback explícito aquí porque:
+     * 1. INT 15h AH=86h está disponible desde 80286+ (prácticamente universal)
+     * 2. Si falla, simplemente retorna inmediatamente (no es crítico)
+     * 3. El sistema continuará funcionando, solo sin delay
+     * 4. "memory" en clobber list previene reordenamiento de código
+     */
 }
 
 /*
