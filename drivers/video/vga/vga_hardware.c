@@ -216,7 +216,7 @@ VOID VgaHardwareReset(VOID)
     VgaWriteGraphicsController(3, 0x00);  /* Data Rotate: no rotation, replace */
     VgaWriteGraphicsController(4, 0x00);  /* Read Map Select: plane 0 */
     VgaWriteGraphicsController(5, 0x00);  /* Graphics Mode: write mode 0, read mode 0 */
-    VgaWriteGraphicsController(6, 0x00);  /* Miscellaneous: text mode addressing */
+    VgaWriteGraphicsController(6, 0x05);  /* Miscellaneous: graphics mode, A0000-AFFFF 64K */
     VgaWriteGraphicsController(7, 0x0F);  /* Color Don't Care: all bits */
     VgaWriteGraphicsController(8, 0xFF);  /* Bit Mask: all bits */
     
@@ -232,13 +232,13 @@ VOID VgaHardwareReset(VOID)
     /* Step 6: Reset Miscellaneous Output Register to default
      * This controls I/O address selection and sync polarities
      * 0x63 = bit0: I/O @ 3Dx (not 3Bx), bit1: RAM enabled, 
-     *        bits2-3: 25MHz dot clock, bit4: 0 (reserved),
-     *        bit5: Vsync-, bit6: Hsync-, bit7: 0 (page select) */
+     *        bits2-3: 25MHz dot clock, bit4: 0 (unused),
+     *        bit5: Vsync-, bit6: Hsync-, bit7: 0 (even page) */
     outb(VGA_MISC_WRITE, 0x63);
     
     /* Step 7: Initialize Sequencer for standard operation */
-    /* Clocking Mode: 0x00 = 8 dots/char clock, no divide, no shift load */
-    VgaWriteSequencer(1, 0x00);
+    /* Clocking Mode: 0x01 = 8-dot mode (graphics), no shift load */
+    VgaWriteSequencer(1, 0x01);
     VgaWriteSequencer(2, 0x0F);  /* Map Mask: all planes enabled */
     VgaWriteSequencer(3, 0x00);  /* Character Map Select: default */
     /* Memory Mode: 0x02 = bit1 set (extended memory enabled), 
