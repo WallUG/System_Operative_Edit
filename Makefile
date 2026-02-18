@@ -28,10 +28,6 @@ ISO_FILE = os.iso
 KERNEL_SOURCES = $(wildcard $(KERNEL_DIR)/*.c) $(wildcard $(KERNEL_DIR)/**/*.c)
 KERNEL_OBJECTS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_SOURCES))
 
-# Archivos ASM del kernel (gdt_flush.asm, idt_load.asm)
-KERNEL_ASM_SOURCES = $(wildcard $(KERNEL_DIR)/interrupt/*.asm)
-KERNEL_ASM_OBJECTS = $(patsubst $(KERNEL_DIR)/%.asm, $(BUILD_DIR)/kernel_%.o, $(KERNEL_ASM_SOURCES))
-
 # Archivos fuente de drivers
 DRIVER_FRAMEWORK_SOURCES = $(wildcard $(DRIVERS_DIR)/framework/*.c)
 DRIVER_VIDEO_SOURCES = $(wildcard $(DRIVERS_DIR)/video/vga/*.c)
@@ -43,8 +39,8 @@ DRIVER_OBJECTS = $(patsubst $(DRIVERS_DIR)/%.c, $(BUILD_DIR)/drivers_%.o, $(DRIV
 LIB_SOURCES = $(wildcard $(LIB_DIR)/*.c)
 LIB_OBJECTS = $(patsubst $(LIB_DIR)/%.c, $(BUILD_DIR)/lib_%.o, $(LIB_SOURCES))
 
-# Todos los objetos (boot + kernel + kernel_asm + drivers + lib)
-ALL_OBJECTS = $(BOOT_OBJ) $(KERNEL_OBJECTS) $(KERNEL_ASM_OBJECTS) $(DRIVER_OBJECTS) $(LIB_OBJECTS)
+# Todos los objetos (boot + kernel + drivers + lib)
+ALL_OBJECTS = $(BOOT_OBJ) $(KERNEL_OBJECTS) $(DRIVER_OBJECTS) $(LIB_OBJECTS)
 
 # Target por defecto
 .PHONY: all
@@ -75,11 +71,6 @@ $(BUILD_DIR)/kernel_%.o: $(KERNEL_DIR)/%.c
 	@echo "Compilando $<..."
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/kernel_interrupt/%.o: $(KERNEL_DIR)/interrupt/%.asm
-	@echo "Ensamblando $<..."
-	@mkdir -p $(dir $@)
-	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD_DIR)/drivers_%.o: $(DRIVERS_DIR)/%.c
 	@echo "Compilando driver $<..."

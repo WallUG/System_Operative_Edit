@@ -2,12 +2,15 @@ ENTRY(start)
 
 SECTIONS
 {
+    /* Multiboot header must be within the first 8KB of the file */
     . = 0x00100000;
 
+    /* Multiboot header requires 4-byte alignment per spec */
     .multiboot ALIGN(4) : {
         *(.multiboot)
     }
 
+    /* Text section starts after multiboot with 16-byte alignment for performance */
     .text ALIGN(16) : {
         *(.text)
     }
@@ -21,15 +24,7 @@ SECTIONS
     }
 
     .bss ALIGN(4K) : {
-        _bss_start = .;
         *(COMMON)
         *(.bss)
-        _bss_end = .;
     }
-
-    /* Stack al final del kernel, 32KB, bien separado */
-    . = ALIGN(4K);
-    _stack_bottom = .;
-    . += 0x8000;
-    _stack_top = .;
 }

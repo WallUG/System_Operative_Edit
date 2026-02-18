@@ -1,53 +1,56 @@
-; boot.asm - Multiboot entry point
+; boot.asm - Multiboot bootloader
+; This bootloader is compatible with GRUB and follows the Multiboot specification
+
+; Set 32-bit mode
 BITS 32
 
-MULTIBOOT_MAGIC       equ 0x1BADB002
-MULTIBOOT_PAGE_ALIGN  equ 1 << 0
-MULTIBOOT_MEMORY_INFO equ 1 << 1
-MULTIBOOT_FLAGS       equ MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO
-MULTIBOOT_CHECKSUM    equ -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
+; Multiboot header constants
+MULTIBOOT_MAGIC         equ 0x1BADB002
+MULTIBOOT_PAGE_ALIGN    equ 1 << 0
+MULTIBOOT_MEMORY_INFO   equ 1 << 1
+MULTIBOOT_FLAGS         equ MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO
+MULTIBOOT_CHECKSUM      equ -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
 
+; Declare multiboot header
 section .multiboot
 align 4
     dd MULTIBOOT_MAGIC
     dd MULTIBOOT_FLAGS
     dd MULTIBOOT_CHECKSUM
 
+; Reserve stack space
+section .bss
+align 16
+stack_bottom:
+    resb 16384      ; 16 KB stack
+stack_top:
+
+; Entry point
 section .text
 global start
 extern kernel_main
-extern _stack_top
 
 start:
-    cli                 ; deshabilitar interrupciones
+    ; Setup stack
+    mov esp, stack_top
 
-    ; IMPORTANTE: guardar EAX y EBX ANTES de cualquier otra cosa
-    ; EAX = multiboot magic number (puesto por GRUB o QEMU)
-    ; EBX = puntero a multiboot_info_t
-    mov edi, eax        ; guardar magic en EDI (no destruido por mov seg)
-    mov esi, ebx        ; guardar mbi    en ESI (no destruido por mov seg)
+    ; Disable interrupts
+    cli
 
-    ; Configurar stack
-    mov esp, _stack_top
-    xor ebp, ebp
+    ; Push multiboot information
+    ; EAX contains magic value
+    ; EBX contains address of multiboot info structure
+    push ebx
+    push eax
 
-    ; Limpiar segmentos usando ax=0 SIN tocar eax completo
-    ; (ya guardamos magic en edi)
-    mov ax, 0x0000
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    ; Pasar argumentos a kernel_main(magic, mbi)
-    push esi            ; arg2: multiboot_info_t* (EBX original)
-    push edi            ; arg1: magic number      (EAX original)
-
+    ; Call kernel main function
     call kernel_main
 
+    ; If kernel_main returns (it shouldn't), hang the system
 .hang:
     cli
     hlt
     jmp .hang
 
+; Mark stack as non-executable (for security)
 section .note.GNU-stack noalloc noexec nowrite progbits
