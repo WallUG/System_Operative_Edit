@@ -57,8 +57,9 @@ static void delay(u32 milliseconds)
     }
     
     microseconds = milliseconds * 1000UL;  /* Safe: max 65,535,000 < 2^32 */
-    cx = (microseconds >> 16) & 0xFFFF;  /* High word */
-    dx = microseconds & 0xFFFF;           /* Low word */
+    cx = (microseconds >> 16) & 0xFFFF;    /* High word: bits 31-16 */
+    dx = microseconds & 0xFFFF;            /* Low word: bits 15-0 */
+    /* CX:DX forma un valor 32-bit: 65,535,000 = 0x03E7FBE8 → CX=0x03E7, DX=0xFBE8 */
     
     /*
      * INT 15h, AH=86h: Wait (BIOS Wait Service)
