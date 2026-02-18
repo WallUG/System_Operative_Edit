@@ -182,4 +182,15 @@ VOID VgaWriteCrtc(UCHAR Index, UCHAR Value);
  */
 VOID VgaSetPalette(UCHAR Index, UCHAR Red, UCHAR Green, UCHAR Blue);
 
+/**
+ * VgaHardwareReset - Perform complete VGA hardware reset
+ * 
+ * Performs a complete VGA hardware reset to clear any inconsistent state
+ * left by previous mode configurations. This includes resetting the
+ * Sequencer, Attribute Controller, Graphics Controller, and CRTC.
+ * 
+ * Must be called BEFORE any mode-specific register programming.
+ */
+VOID VgaHardwareReset(VOID);
+
 #endif /* _VGA_H */

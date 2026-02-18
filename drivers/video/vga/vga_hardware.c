@@ -152,3 +152,99 @@ VOID VgaSetBitMask(UCHAR Mask)
 {
     VgaWriteGraphicsController(8, Mask);
 }
+
+/**
+ * VgaHardwareReset - Perform complete VGA hardware reset
+ * 
+ * This function performs a complete VGA hardware reset to clear any
+ * inconsistent state left by previous mode configurations (e.g., bootloader).
+ * 
+ * The reset sequence:
+ * 1. Disable video output (prevents visual glitches during reset)
+ * 2. Perform async + sync Sequencer reset
+ * 3. Reset Attribute Controller flip-flop
+ * 4. Clear Graphics Controller registers to default state
+ * 5. Unlock and clear CRTC registers
+ * 6. Reset Miscellaneous Output Register
+ * 7. Initialize Sequencer for normal operation
+ * 
+ * This must be called BEFORE any mode-specific register programming.
+ * Calling after mode programming will overwrite mode settings.
+ */
+VOID VgaHardwareReset(VOID)
+{
+    int i;
+    
+    /* Step 1: Disable video output via Attribute Controller
+     * Reading IS1 resets flip-flop, then write index with bit 5=0 to disable video */
+    inb(VGA_INPUT_STATUS_1);
+    outb(VGA_AC_INDEX, 0x00);  /* Disable video (bit 5 = 0) */
+    
+    /* Step 2: Perform complete Sequencer reset
+     * Async reset (0x00) stops all sequencer operations
+     * Sync reset (0x01) holds sequencer in reset while clearing state
+     * Normal operation (0x03) resumes operations with clean state */
+    outb(VGA_SEQ_INDEX, 0x00);
+    outb(VGA_SEQ_DATA, 0x00);   /* Async reset */
+    
+    /* Small I/O delay to ensure reset propagates through hardware
+     * Port 0x80 is the POST diagnostic port, used for timing delays */
+    for (i = 0; i < 5; i++) {
+        outb(0x80, 0);
+    }
+    
+    outb(VGA_SEQ_INDEX, 0x00);
+    outb(VGA_SEQ_DATA, 0x01);   /* Sync reset */
+    
+    /* Another I/O delay (POST diagnostic port) */
+    for (i = 0; i < 5; i++) {
+        outb(0x80, 0);
+    }
+    
+    outb(VGA_SEQ_INDEX, 0x00);
+    outb(VGA_SEQ_DATA, 0x03);   /* Normal operation */
+    
+    /* Step 3: Reset Attribute Controller flip-flop state
+     * Read IS1 to ensure flip-flop is in known state */
+    inb(VGA_INPUT_STATUS_1);
+    
+    /* Step 4: Reset Graphics Controller to safe defaults
+     * Clear shift/rotate modes, set standard write mode */
+    VgaWriteGraphicsController(0, 0x00);  /* Set/Reset: 0 */
+    VgaWriteGraphicsController(1, 0x00);  /* Enable Set/Reset: 0 */
+    VgaWriteGraphicsController(2, 0x00);  /* Color Compare: 0 */
+    VgaWriteGraphicsController(3, 0x00);  /* Data Rotate: no rotation, replace */
+    VgaWriteGraphicsController(4, 0x00);  /* Read Map Select: plane 0 */
+    VgaWriteGraphicsController(5, 0x00);  /* Graphics Mode: write mode 0, read mode 0 */
+    VgaWriteGraphicsController(6, 0x05);  /* Miscellaneous: graphics mode, A0000-AFFFF 64K */
+    VgaWriteGraphicsController(7, 0x0F);  /* Color Don't Care: all bits */
+    VgaWriteGraphicsController(8, 0xFF);  /* Bit Mask: all bits */
+    
+    /* Step 5: Unlock CRTC registers and clear critical ones
+     * CRTC register 0x11 bit 7 locks registers 0-7 */
+    outb(VGA_CRTC_INDEX, 0x11);
+    outb(VGA_CRTC_DATA, 0x00);  /* Unlock CRTC, clear Vertical Retrace End */
+    
+    /* Clear start address registers (prevents display offset issues) */
+    VgaWriteCrtc(0x0C, 0x00);   /* Start Address High */
+    VgaWriteCrtc(0x0D, 0x00);   /* Start Address Low */
+    
+    /* Step 6: Reset Miscellaneous Output Register to default
+     * This controls I/O address selection and sync polarities
+     * 0x63 = bit0: I/O @ 3Dx (not 3Bx), bit1: RAM enabled, 
+     *        bits2-3: 25MHz dot clock, bit4: 0 (unused),
+     *        bit5: Vsync-, bit6: Hsync-, bit7: 0 (even page) */
+    outb(VGA_MISC_WRITE, 0x63);
+    
+    /* Step 7: Initialize Sequencer for standard operation */
+    /* Clocking Mode: 0x01 = 8-dot mode (graphics), no shift load */
+    VgaWriteSequencer(1, 0x01);
+    VgaWriteSequencer(2, 0x0F);  /* Map Mask: all planes enabled */
+    VgaWriteSequencer(3, 0x00);  /* Character Map Select: default */
+    /* Memory Mode: 0x02 = bit1 set (extended memory enabled), 
+     * bit2 clear (odd/even disabled), bit3 clear (Chain 4 disabled) */
+    VgaWriteSequencer(4, 0x02);
+    
+    /* Final flip-flop reset before returning */
+    inb(VGA_INPUT_STATUS_1);
+}

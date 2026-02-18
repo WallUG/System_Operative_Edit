@@ -11,6 +11,7 @@ extern VOID VgaWriteSequencer(UCHAR Index, UCHAR Value);
 extern VOID VgaWriteGraphicsController(UCHAR Index, UCHAR Value);
 extern VOID VgaWriteCrtc(UCHAR Index, UCHAR Value);
 extern VOID VgaClearScreen(UCHAR Color);
+extern VOID VgaHardwareReset(VOID);
 
 static inline void outb_vga(uint16_t port, uint8_t value)
 {
@@ -103,16 +104,12 @@ NTSTATUS VgaSetMode(UCHAR Mode)
 
     if (Mode == VGA_MODE_GRAPHICS_640x480x16)
     {
-        /* 0. Reset sincrono del Sequencer antes de cualquier cambio.
-         *    GRUB puede dejar el Sequencer en un estado con Shift4/Shift Load
-         *    activos (Clocking Mode bits 4,3) que causan mirror horizontal.
-         *    El reset sincrono (0x01) + reset async (0x00) limpia el estado. */
-        outb_vga(VGA_SEQ_INDEX, 0x00);
-        outb_vga(VGA_SEQ_DATA,  0x01);   /* reset sincrono */
-        /* Pequeno delay de I/O */
-        outb_vga(0x80, 0); outb_vga(0x80, 0); outb_vga(0x80, 0);
-        outb_vga(VGA_SEQ_INDEX, 0x00);
-        outb_vga(VGA_SEQ_DATA,  0x03);   /* operacion normal */
+        /* 0. COMPLETE HARDWARE RESET
+         *    Perform full VGA hardware reset to clear any inconsistent state
+         *    left by bootloader (Mode 13h or text mode). This ensures all
+         *    VGA registers (Sequencer, CRTC, Graphics Controller, Attribute
+         *    Controller) are in a known, clean state before mode programming. */
+        VgaHardwareReset();
 
         /* 1. Desbloquear CRTC registers 0-7 */
         outb_vga(VGA_CRTC_INDEX, 0x11);
