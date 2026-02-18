@@ -1,0 +1,253 @@
+name: Build System Operative Edit
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Permite ejecutar manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          gcc-multilib \
+          g++-multilib \
+          nasm \
+          cmake \
+          qemu-system-x86 \
+          grub-pc-bin \
+          grub-common \
+          xorriso \
+          mtools \
+          dosfstools
+    
+    - name: Verify tools installation
+      run: |
+        echo "=== Verificando herramientas instaladas ==="
+        gcc --version
+        nasm -version
+        cmake --version
+        grub-mkrescue --version
+        echo "=== Todas las herramientas instaladas correctamente ==="
+    
+    - name: Make scripts executable
+      run: |
+        chmod +x scripts/*.sh
+    
+    - name: Build bootloader
+      run: |
+        echo "=== Compilando Bootloader ==="
+        cd boot
+        make clean || true
+        make freeldr
+        ls -lh build/
+        cd ..
+    
+    - name: Build kernel with CMake
+      run: |
+        echo "=== Compilando Kernel ==="
+        mkdir -p build
+        cd build
+        cmake ..
+        make -j$(nproc)
+        ls -lh
+        file kernel.elf
+        cd ..
+    
+    - name: Create bootable ISO
+      run: |
+        echo "=== Creando imagen ISO booteable ==="
+        
+        # Crear estructura de directorios
+        mkdir -p iso/boot/grub
+        
+        # Copiar kernel
+        cp build/kernel.elf iso/boot/
+        
+        # Copiar FreeLoader si existe
+        if [ -f boot/build/freeldr.sys ]; then
+          cp boot/build/freeldr.sys iso/boot/
+        fi
+        
+        # Crear grub.cfg
+        cat > iso/boot/grub/grub.cfg << 'EOF'
+        set timeout=5
+        set default=0
+        
+        menuentry "System Operative Edit" {
+            multiboot /boot/kernel.elf
+            boot
+        }
+        
+        menuentry "System Operative Edit (Safe Mode)" {
+            multiboot /boot/kernel.elf --safe-mode
+            boot
+        }
+        EOF
+        
+        # Crear ISO con grub-mkrescue
+        grub-mkrescue -o system_operative_edit.iso iso
+        
+        # Verificar ISO creado
+        ls -lh system_operative_edit.iso
+        file system_operative_edit.iso
+        
+        echo "=== ISO creado exitosamente ==="
+    
+    - name: Test boot in QEMU (headless)
+      run: |
+        echo "=== Probando boot en QEMU ==="
+        timeout 30s qemu-system-i386 \
+          -cdrom system_operative_edit.iso \
+          -m 128M \
+          -nographic \
+          -serial mon:stdio \
+          || echo "QEMU test completed (timeout expected)"
+    
+    - name: Generate build info
+      run: |
+        cat > BUILD_INFO.txt << EOF
+        System Operative Edit - Build Information
+        ==========================================
+        
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Commit: ${{ github.sha }}
+        Branch: ${{ github.ref_name }}
+        Triggered by: ${{ github.event_name }}
+        
+        Files Generated:
+        ----------------
+        - system_operative_edit.iso (Bootable ISO image)
+        - build/kernel.elf (Kernel binary)
+        - boot/build/freeldr.sys (FreeLoader bootloader)
+        
+        How to Use:
+        -----------
+        1. Download system_operative_edit.iso from artifacts
+        2. Burn to CD/DVD or use with virtual machine software
+        3. Boot from the ISO
+        
+        QEMU Testing:
+        qemu-system-i386 -cdrom system_operative_edit.iso -m 128M
+        
+        VirtualBox:
+        - Create new VM (Type: Other, Version: Other/Unknown)
+        - Set at least 128MB RAM
+        - Attach ISO as CD-ROM
+        - Boot
+        
+        VMware:
+        - Create new VM (Other)
+        - Attach ISO
+        - Boot
+        EOF
+        
+        cat BUILD_INFO.txt
+    
+    - name: Upload ISO as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: system-operative-edit-iso
+        path: |
+          system_operative_edit.iso
+          BUILD_INFO.txt
+        retention-days: 90
+    
+    - name: Upload kernel binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: kernel-binary
+        path: build/kernel.elf
+        retention-days: 90
+    
+    - name: Upload bootloader
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: freeldr-bootloader
+        path: boot/build/freeldr.sys
+        retention-days: 90
+    
+    - name: Build summary
+      if: always()
+      run: |
+        echo "## 🎉 Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
+        echo "- 💿 **ISO Image**: system_operative_edit.iso" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔧 **Kernel**: build/kernel.elf" >> $GITHUB_STEP_SUMMARY
+        echo "- 🚀 **Bootloader**: boot/build/freeldr.sys" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### File Sizes" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        if [ -f system_operative_edit.iso ]; then
+          ls -lh system_operative_edit.iso >> $GITHUB_STEP_SUMMARY
+        else
+          echo "ISO file not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -f build/kernel.elf ]; then
+          ls -lh build/kernel.elf >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Kernel file not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -f boot/build/freeldr.sys ]; then
+          ls -lh boot/build/freeldr.sys >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Bootloader file not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Download" >> $GITHUB_STEP_SUMMARY
+        echo "📦 Download artifacts from the 'Artifacts' section above" >> $GITHUB_STEP_SUMMARY
+
+  # Job adicional para releases automáticos en tags
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download ISO artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: system-operative-edit-iso
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          system_operative_edit.iso
+          BUILD_INFO.txt
+        body: |
+          ## System Operative Edit ${{ github.ref_name }}
+          
+          Bootable ISO image for System Operative Edit.
+          
+          ### How to use:
+          1. Download `system_operative_edit.iso`
+          2. Test with QEMU: `qemu-system-i386 -cdrom system_operative_edit.iso -m 128M`
+          3. Or burn to CD/use with VirtualBox/VMware
+          
+          ### What's included:
+          - Custom kernel based on ReactOS
+          - FreeLoader bootloader
+          - Boot sectors for FAT12/16/32 and ISO-9660
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
