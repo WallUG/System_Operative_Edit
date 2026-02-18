@@ -2,11 +2,61 @@
 
 Este documento describe el plan de desarrollo del sistema operativo personalizado en fases progresivas.
 
-## Visión General
+## Estado Actual
 
-El desarrollo sigue un enfoque incremental, construyendo funcionalidad básica primero y agregando características más avanzadas gradualmente.
+| Version | Estado     | Descripcion                                      |
+|---------|------------|--------------------------------------------------|
+| v0.1    | ✅ COMPLETO | GUI basica, VGA 640x480x16, mouse PS/2, PIC 8259 |
+| v0.2    | ✅ COMPLETO | PMM + VMM (paginacion) + Scheduler Round-Robin   |
+| v0.3    | 🔲 PENDIENTE| Syscalls (INT 0x30) + proceso GUI en Ring 3      |
+| v0.4    | 🔲 PENDIENTE| Sistema de archivos FAT12 (leer ISO)             |
+| v0.5    | 🔲 PENDIENTE| Shell basico + primer proceso de usuario         |
 
-**Duración Estimada Total**: 12-18 meses (dependiendo de recursos)
+## v0.2 — Separacion de responsabilidades (COMPLETADO)
+
+### Arquitectura implementada
+
+```
+kernel_main()  (Ring 0, PID 0 = idle)
+   │
+   ├── gdt_init()   — GDT con descriptores Ring 0 y Ring 3
+   ├── idt_init()   — IDT + PIC 8259 remapeado a 0x20-0x2F
+   ├── pmm_init()   — Bitmap allocator de frames fisicos (64MB)
+   ├── vmm_init()   — Paginacion x86: identity map kernel + VGA
+   ├── proc_init()  — Crea idle (PID 0, TID 1)
+   ├── MouseInit()  — Driver PS/2
+   ├── proc_create_kernel("gui_server", GuiMainLoop)  — PID 1, TID 2
+   └── scheduler_init()  — Cola round-robin activa
+
+IRQ0 (timer 18.2 Hz)
+   └── irq0_timer_handler (asm)
+          └── scheduler_tick(ctx)
+                 ├── decrement quantum
+                 ├── si quantum==0: context switch
+                 │      ├── guardar ctx del thread actual
+                 │      ├── elegir siguiente READY
+                 │      ├── cambiar CR3 si diferente proceso
+                 │      └── restaurar ctx del nuevo thread
+                 └── IRET → nuevo thread ejecuta
+```
+
+### Por que importa la separacion
+
+En v0.1, `kernel_main()` llamaba `GuiMainLoop()` directamente — el kernel
+quedaba atrapado en el loop de la GUI. Si la GUI fallaba, el SO entero moria.
+
+En v0.2, `GuiMainLoop()` es el entry point de un **proceso separado** (PID 1).
+El kernel (PID 0) solo ejecuta el idle (`sti; hlt`) y el scheduler despierta
+al proceso GUI en cada tick del timer. Esta separacion permite:
+- Multiples procesos futuros sin cambiar el kernel
+- El kernel puede matar/reiniciar el proceso GUI sin reiniciar el SO
+- Base para Ring 3 en v0.3
+
+## Vision General
+
+El desarrollo sigue un enfoque incremental, construyendo funcionalidad basica primero.
+
+**Duracion Estimada Total**: 12-18 meses (dependiendo de recursos)
 
 ---
 

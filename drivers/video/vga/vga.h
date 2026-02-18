@@ -136,6 +136,14 @@ VOID VgaDrawRect(INT x, INT y, INT width, INT height, UCHAR Color);
 VOID VgaDrawDemo(VOID);
 
 /**
+ * VgaGetPixel - Leer el color de un pixel desde el shadow framebuffer
+ * @x: Coordenada X
+ * @y: Coordenada Y
+ * Returns: Color del pixel (0-15)
+ */
+UCHAR VgaGetPixel(INT x, INT y);
+
+/**
  * VgaGetDeviceObject - Get VGA device object
  * 
  * Returns: Pointer to VGA device object or NULL

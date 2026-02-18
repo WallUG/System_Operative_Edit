@@ -1,111 +1,197 @@
 /*
  * PROJECT:     System_Operative_Edit
  * LICENSE:     GPL-3.0
- * PURPOSE:     VGA Initialization
- * COPYRIGHT:   Adapted from ReactOS VGA Driver (GPL-3.0)
- *              Original: ReactOS Project
- *              Adaptation: Universidad de Guayaquil
+ * PURPOSE:     VGA Initialization - Modo 640x480x16 (modo 0x12)
  */
 
 #include "vga.h"
 
-/* External hardware functions */
 extern VOID VgaInitializePalette(VOID);
 extern VOID VgaWriteSequencer(UCHAR Index, UCHAR Value);
 extern VOID VgaWriteGraphicsController(UCHAR Index, UCHAR Value);
 extern VOID VgaWriteCrtc(UCHAR Index, UCHAR Value);
-extern void outb(uint16_t port, uint8_t value);
-extern uint8_t inb(uint16_t port);
+extern VOID VgaClearScreen(UCHAR Color);
 
-/**
- * VgaSetMode - Set VGA display mode
- * @Mode: VGA mode number
- * 
- * Returns: STATUS_SUCCESS or error code
+static inline void outb_vga(uint16_t port, uint8_t value)
+{
+    __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
+}
+
+static inline uint8_t inb_vga(uint16_t port)
+{
+    uint8_t value;
+    __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
+    return value;
+}
+
+/*
+ * Tabla completa de registros para modo 640x480x16 (VGA modo 0x12)
+ * Valores estandar de la especificacion VGA original de IBM
  */
+
+/* Sequencer registers [index] = value */
+static const UCHAR seq_regs[] = {
+    0x03,   /* [0] Reset: normal operation */
+    0x01,   /* [1] Clocking Mode: 8 dot/char, bit3=0(NO Shift4), bit4=0(NO Shift Load) */
+    0x0F,   /* [2] Map Mask: all planes enabled */
+    0x00,   /* [3] Character Map Select */
+    0x06,   /* [4] Memory Mode: chain4 off, odd/even off, extended mem */
+};
+
+/* CRTC registers [index] = value */
+static const UCHAR crtc_regs[] = {
+    0x5F,   /* [0]  Horizontal Total */
+    0x4F,   /* [1]  Horizontal Display End */
+    0x50,   /* [2]  Start Horizontal Blanking */
+    0x82,   /* [3]  End Horizontal Blanking */
+    0x54,   /* [4]  Start Horizontal Retrace */
+    0x80,   /* [5]  End Horizontal Retrace */
+    0x0D,   /* [6]  Vertical Total: 0x0D correcto para 480 lineas (0x0B causaba mirror) */
+    0x3E,   /* [7]  Overflow */
+    0x00,   /* [8]  Preset Row Scan */
+    0x40,   /* [9]  Max Scan Line */
+    0x00,   /* [10] Cursor Start */
+    0x00,   /* [11] Cursor End */
+    0x00,   /* [12] Start Address High */
+    0x00,   /* [13] Start Address Low */
+    0x00,   /* [14] Cursor Location High */
+    0x00,   /* [15] Cursor Location Low */
+    0xEA,   /* [16] Vertical Retrace Start */
+    0x8C,   /* [17] Vertical Retrace End */
+    0xDF,   /* [18] Vertical Display End */
+    0x28,   /* [19] Offset */
+    0x00,   /* [20] Underline Location */
+    0xE7,   /* [21] Start Vertical Blanking */
+    0x04,   /* [22] End Vertical Blanking */
+    0xE3,   /* [23] CRT Mode Control */
+    0xFF,   /* [24] Line Compare */
+};
+
+/* Graphics Controller registers [index] = value */
+static const UCHAR gc_regs[] = {
+    0x00,   /* [0] Set/Reset */
+    0x00,   /* [1] Enable Set/Reset */
+    0x00,   /* [2] Color Compare */
+    0x00,   /* [3] Data Rotate: sin rotacion, operacion replace */
+    0x00,   /* [4] Read Map Select: plano 0 */
+    0x00,   /* [5] Graphics Mode: write mode 0, read mode 0, bits[4:3]=00 NO shift */
+    0x05,   /* [6] Miscellaneous: bit0=1 graphics, bit1=0 no chain odd/even, A000-AFFF */
+    0x0F,   /* [7] Color Don't Care */
+    0xFF,   /* [8] Bit Mask: todos los bits */
+};
+
+/* Attribute Controller registers [index] = value
+ * VALORES CORRECTOS para modo 0x12 (640x480x16) segun especificacion IBM VGA.
+ * Los valores 0x38-0x3F en paletas 8-15 eran incorrectos y causaban
+ * el efecto espejo horizontal al mapear colores erroneamente. */
+static const UCHAR ac_regs[] = {
+    /* [0-15] Paleta: mapeo 1:1 de indice a color DAC (0-15) */
+    0x00, 0x01, 0x02, 0x03,
+    0x04, 0x05, 0x06, 0x07,
+    0x08, 0x09, 0x0A, 0x0B,
+    0x0C, 0x0D, 0x0E, 0x0F,
+    0x01,   /* [16] Mode Control: 0x01 = graphics mode, alpha disable, NO 8-bit (bit6=0 fixes mirror) */
+    0x00,   /* [17] Overscan Color: negro */
+    0x0F,   /* [18] Color Plane Enable: habilitar los 4 planos */
+    0x00,   /* [19] Horizontal Pixel Panning: sin desplazamiento */
+    0x00,   /* [20] Color Select */
+};
+
 NTSTATUS VgaSetMode(UCHAR Mode)
 {
-    if (Mode == VGA_MODE_GRAPHICS_640x480x16) {
-        /* Set mode 0x12: 640x480x16 colors */
-        
-        /* Use BIOS interrupt to set mode (simplified) */
-        /* In a real implementation, we would:
-         * 1. Save current mode
-         * 2. Program VGA registers directly
-         * 3. Set up planar graphics mode
-         */
-        
-        /* For now, we'll program basic registers for mode 0x12 */
-        
-        /* Miscellaneous Output Register */
-        outb(VGA_MISC_WRITE, 0xE3);
-        
-        /* Sequencer Registers */
-        VgaWriteSequencer(0x00, 0x03);  /* Reset */
-        VgaWriteSequencer(0x01, 0x01);  /* Clocking Mode */
-        VgaWriteSequencer(0x02, 0x0F);  /* Map Mask */
-        VgaWriteSequencer(0x03, 0x00);  /* Character Map Select */
-        VgaWriteSequencer(0x04, 0x06);  /* Memory Mode */
-        
-        /* Graphics Controller Registers */
-        VgaWriteGraphicsController(0x00, 0x00);  /* Set/Reset */
-        VgaWriteGraphicsController(0x01, 0x00);  /* Enable Set/Reset */
-        VgaWriteGraphicsController(0x02, 0x00);  /* Color Compare */
-        VgaWriteGraphicsController(0x03, 0x00);  /* Data Rotate */
-        VgaWriteGraphicsController(0x04, 0x00);  /* Read Map Select */
-        VgaWriteGraphicsController(0x05, 0x00);  /* Graphics Mode */
-        VgaWriteGraphicsController(0x06, 0x05);  /* Miscellaneous */
-        VgaWriteGraphicsController(0x07, 0x0F);  /* Color Don't Care */
-        VgaWriteGraphicsController(0x08, 0xFF);  /* Bit Mask */
-        
-        /* Initialize palette */
+    int i;
+
+    if (Mode == VGA_MODE_GRAPHICS_640x480x16)
+    {
+        /* 0. Reset sincrono del Sequencer antes de cualquier cambio.
+         *    GRUB puede dejar el Sequencer en un estado con Shift4/Shift Load
+         *    activos (Clocking Mode bits 4,3) que causan mirror horizontal.
+         *    El reset sincrono (0x01) + reset async (0x00) limpia el estado. */
+        outb_vga(VGA_SEQ_INDEX, 0x00);
+        outb_vga(VGA_SEQ_DATA,  0x01);   /* reset sincrono */
+        /* Pequeno delay de I/O */
+        outb_vga(0x80, 0); outb_vga(0x80, 0); outb_vga(0x80, 0);
+        outb_vga(VGA_SEQ_INDEX, 0x00);
+        outb_vga(VGA_SEQ_DATA,  0x03);   /* operacion normal */
+
+        /* 1. Desbloquear CRTC registers 0-7 */
+        outb_vga(VGA_CRTC_INDEX, 0x11);
+        outb_vga(VGA_CRTC_DATA,  inb_vga(VGA_CRTC_DATA) & ~0x80);
+
+        /* 2. Miscellaneous Output Register */
+        outb_vga(VGA_MISC_WRITE, 0xE3);
+
+        /* 3. Sequencer */
+        for (i = 0; i < 5; i++) {
+            VgaWriteSequencer((UCHAR)i, seq_regs[i]);
+        }
+
+        /* 4. CRTC */
+        for (i = 0; i < 25; i++) {
+            VgaWriteCrtc((UCHAR)i, crtc_regs[i]);
+        }
+
+        /* 5. Graphics Controller */
+        for (i = 0; i < 9; i++) {
+            VgaWriteGraphicsController((UCHAR)i, gc_regs[i]);
+        }
+
+        /* 6. Attribute Controller
+         * PROTOCOLO CORRECTO: leer IS1 UNA SOLA VEZ antes del loop para
+         * resetear el flip-flop. Dentro del loop SOLO escribir INDEX+DATA
+         * sin leer IS1 de nuevo — leerlo en cada iteracion desfasa el
+         * flip-flop y programa el valor en el registro equivocado,
+         * causando el efecto espejo horizontal. */
+        inb_vga(VGA_INPUT_STATUS_1);            /* reset flip-flop UNA VEZ */
+        for (i = 0; i < 21; i++) {
+            outb_vga(VGA_AC_INDEX, (UCHAR)i);   /* indice (flip-flop -> INDEX) */
+            outb_vga(VGA_AC_WRITE, ac_regs[i]); /* valor  (flip-flop -> DATA)  */
+        }
+
+        /* 7. Habilitar video en el AC (bit 5 = 1, sin seleccionar registro) */
+        inb_vga(VGA_INPUT_STATUS_1);
+        outb_vga(VGA_AC_INDEX, 0x20);  /* bit5=1 = video habilitado */
+
+        /* 8. Paleta de colores estandar */
         VgaInitializePalette();
-        
+
         return STATUS_SUCCESS;
     }
-    else if (Mode == VGA_MODE_TEXT_80x25) {
-        /* Text mode - already set by BIOS, just acknowledge */
+    else if (Mode == VGA_MODE_TEXT_80x25)
+    {
+        /* Modo texto ya configurado por GRUB, no hacer nada */
         return STATUS_SUCCESS;
     }
-    
+
     return STATUS_INVALID_PARAMETER;
 }
 
-/**
- * VgaInitializeDevice - Initialize VGA device
- * @DevExt: Device extension
- * 
- * Returns: STATUS_SUCCESS or error code
- */
 NTSTATUS VgaInitializeDevice(PVGA_DEVICE_EXTENSION DevExt)
 {
     NTSTATUS Status;
-    
+
     if (!DevExt) {
         return STATUS_INVALID_PARAMETER;
     }
-    
-    /* Set graphics mode */
+
     Status = VgaSetMode(VGA_MODE_GRAPHICS_640x480x16);
     if (!NT_SUCCESS(Status)) {
         return Status;
     }
-    
-    /* Setup device extension */
-    DevExt->FrameBuffer = (PVOID)VGA_BASE_ADDRESS;
-    DevExt->ScreenWidth = 640;
-    DevExt->ScreenHeight = 480;
-    DevExt->BitsPerPixel = 4;  /* 4 bits per pixel = 16 colors */
-    DevExt->GraphicsMode = TRUE;
-    DevExt->CurrentMode = VGA_MODE_GRAPHICS_640x480x16;
-    
-    /* Initialize palette */
+
+    DevExt->FrameBuffer   = (PVOID)VGA_BASE_ADDRESS;
+    DevExt->ScreenWidth   = 640;
+    DevExt->ScreenHeight  = 480;
+    DevExt->BitsPerPixel  = 4;
+    DevExt->GraphicsMode  = TRUE;
+    DevExt->CurrentMode   = VGA_MODE_GRAPHICS_640x480x16;
+
     for (int i = 0; i < 16; i++) {
         DevExt->CurrentPalette[i] = (UCHAR)i;
     }
-    
-    /* Clear screen to black */
+
+    /* Limpiar pantalla a negro */
     VgaClearScreen(VGA_COLOR_BLACK);
-    
+
     return STATUS_SUCCESS;
 }

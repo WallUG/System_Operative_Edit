@@ -28,7 +28,7 @@ NTSTATUS IoCreateDevice(
     IN PUNICODE_STRING DeviceName OPTIONAL,
     IN DEVICE_TYPE DeviceType,
     IN ULONG DeviceCharacteristics,
-    IN BOOLEAN Exclusive,
+    IN BOOLEAN Exclusive __attribute__((unused)),
     OUT PDEVICE_OBJECT *DeviceObject
 )
 {

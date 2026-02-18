@@ -63,7 +63,10 @@ void gdt_init(void)
     /* Load GDT */
     __asm__ volatile("lgdt %0" : : "m"(gdtp));
     
-    /* Reload segment registers */
+    /* Reload segment registers.
+     * El ljmp recarga CS con el selector 0x08 (kernel code segment).
+     * Usamos una direccion absoluta con $1f para evitar problemas de
+     * resolucion de labels en inline asm de GCC. */
     __asm__ volatile(
         "mov $0x10, %%ax\n"
         "mov %%ax, %%ds\n"
@@ -71,8 +74,8 @@ void gdt_init(void)
         "mov %%ax, %%fs\n"
         "mov %%ax, %%gs\n"
         "mov %%ax, %%ss\n"
-        "ljmp $0x08, $flush\n"
-        "flush:\n"
+        "ljmp $0x08, $1f\n"
+        "1:\n"
         ::: "eax"
     );
 }

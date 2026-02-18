@@ -2,10 +2,12 @@
 
 void hal_init(void)
 {
-    /* Disable interrupts during initialization */
-    cpu_disable_interrupts();
+    /* Las interrupciones ya fueron habilitadas despues de idt_init() en main.c.
+     * NO llamar cli aqui — matar las interrupciones despues del IDT hace que
+     * el mouse PS/2 y el idle loop (hlt) no funcionen, lo que desactiva la CPU
+     * en VMware/VirtualBox con el mensaje 'guest disabled the CPU'. */
 
-    /* HAL initialized */
+    /* HAL inicializado correctamente */
 }
 
 /* I/O port operations */
