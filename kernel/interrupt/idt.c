@@ -236,10 +236,10 @@ __asm__(
     "  movw %ax,   %fs\n"
     "  movw %ax,   %gs\n"
 
-    /* [5] EOI: avisar al PIC que recibimos el tick ANTES de llamar
-     *     al scheduler, para que el siguiente tick pueda encolarse */
+    /* [5] EOI + incrementar tick counter global */
     "  movb $0x20, %al\n"
     "  outb %al,   $0x20\n"
+    "  incl g_kernel_ticks\n"
 
     /* [6] Llamar a scheduler_tick(cpu_context_t* ctx)
      *
@@ -289,6 +289,9 @@ __asm__(
 /* ═══════════════════════════════════════════════════════
  * Helpers IDT
  * ═══════════════════════════════════════════════════════ */
+/* Tick counter global — incrementado en cada IRQ0, visible para syscalls */
+volatile uint32_t g_kernel_ticks = 0;
+
 static void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
 {
     idt[num].offset_low  = base & 0xFFFF;
@@ -296,6 +299,12 @@ static void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags
     idt[num].selector    = sel;
     idt[num].zero        = 0;
     idt[num].type_attr   = flags;
+}
+
+/* Versión pública usada por syscall.c para registrar INT 0x30 */
+void idt_set_gate_pub(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
+{
+    idt_set_gate(num, base, sel, flags);
 }
 
 /* ═══════════════════════════════════════════════════════

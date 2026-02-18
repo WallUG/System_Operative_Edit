@@ -6,6 +6,8 @@
 #include "mm/vmm.h"
 #include "proc/process.h"
 #include "proc/scheduler.h"
+#include "interrupt/tss.h"
+#include "interrupt/syscall.h"
 
 /* Forward declarations */
 extern void gdt_init(void);
@@ -142,6 +144,13 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] VMM + paginacion activada");
 
+    /* TSS: necesario para Ring 3 → Ring 0 en syscalls e interrupciones.
+     * Debe inicializarse DESPUES de gdt_init() y vmm_init().
+     * gdt_install_tss() extiende la GDT con el descriptor del TSS en entrada 5. */
+    tss_init();
+    screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    screen_writeln("[OK] TSS inicializado (selector 0x28)");
+
     /* Gestor de procesos: crear proceso idle (PID 0) */
     proc_init();
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
@@ -157,9 +166,16 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     /* Crear el proceso GUI como proceso de kernel (Ring 0 por ahora).
      * GuiMainLoop() sera el entry point del thread GUI.
      * El scheduler lo ejecutara de forma cooperativa con el idle. */
+    /* Syscalls: registrar INT 0x30 en la IDT con DPL=3
+     * Debe hacerse DESPUES de idt_init() porque usa idt_set_gate_pub(). */
+    syscall_init();
+    screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
+    screen_writeln("[OK] Syscalls INT 0x30 registradas (DPL=3)");
+
     proc_create_kernel("gui_server", GuiMainLoop);
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Proceso gui_server creado (PID 1)");
+    screen_writeln("     -> Usa syscalls via INT 0x30");
 
     /* Inicializar el scheduler.
      * proc_create_kernel() ya llamo scheduler_add_thread() internamente

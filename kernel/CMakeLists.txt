@@ -9,6 +9,8 @@ add_library(kernel OBJECT
     proc/scheduler.c
     interrupt/gdt.c
     interrupt/idt.c
+    interrupt/tss.c
+    interrupt/syscall.c
     ../drivers/framework/io_manager.c
     ../drivers/framework/device.c
     ../drivers/hal/display.c
