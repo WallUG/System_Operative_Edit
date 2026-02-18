@@ -46,7 +46,7 @@ static const UCHAR crtc_regs[] = {
     0x82,   /* [3]  End Horizontal Blanking */
     0x54,   /* [4]  Start Horizontal Retrace */
     0x80,   /* [5]  End Horizontal Retrace */
-    0x0D,   /* [6]  Vertical Total: 0x0D correcto para 480 lineas (0x0B causaba mirror) */
+    0x0B,   /* [6]  Vertical Total: 0x0B correcto para 640x480x16 (modo 0x12) */
     0x3E,   /* [7]  Overflow */
     0x00,   /* [8]  Preset Row Scan */
     0x40,   /* [9]  Max Scan Line */
