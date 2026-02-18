@@ -41,9 +41,21 @@
  */
 static void animation_delay(unsigned int milliseconds)
 {
-    unsigned long microseconds = milliseconds * 1000UL;
-    unsigned int cx = (microseconds >> 16) & 0xFFFF;  /* High word */
-    unsigned int dx = microseconds & 0xFFFF;           /* Low word */
+    unsigned long microseconds;
+    unsigned int cx, dx;
+    
+    /*
+     * Limitar a 65535 ms (~65 segundos) para prevenir overflow
+     * BIOS INT 15h AH=86h típicamente soporta hasta ~1 segundo,
+     * pero algunos implementan hasta ~65 segundos (CX:DX máximo)
+     */
+    if (milliseconds > 65535) {
+        milliseconds = 65535;
+    }
+    
+    microseconds = milliseconds * 1000UL;
+    cx = (microseconds >> 16) & 0xFFFF;  /* High word */
+    dx = microseconds & 0xFFFF;           /* Low word */
     
     /*
      * INT 15h, AH=86h: Wait (BIOS Wait Service)
@@ -54,7 +66,7 @@ static void animation_delay(unsigned int milliseconds)
         "int $0x15"
         :                                    /* No output */
         : "a"(0x8600), "c"(cx), "d"(dx)     /* Input: AH=86h, CX:DX=microseconds */
-        : "cc"                               /* Clobbers: condition codes */
+        : "cc", "memory"                     /* Clobbers: flags, memory barrier */
     );
     
     /*
@@ -62,6 +74,7 @@ static void animation_delay(unsigned int milliseconds)
      * 1. INT 15h AH=86h está disponible desde 80286+ (prácticamente universal)
      * 2. Si falla, simplemente retorna inmediatamente (no es crítico)
      * 3. El sistema continuará funcionando, solo sin delay
+     * 4. "memory" en clobber list previene reordenamiento de código
      */
 }
 
