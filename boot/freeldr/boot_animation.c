@@ -50,12 +50,13 @@ static void delay(u32 milliseconds)
      * Limitar a 65535 ms (~65 segundos) para prevenir overflow
      * BIOS INT 15h AH=86h típicamente soporta hasta ~1 segundo,
      * pero algunos implementan hasta ~65 segundos (CX:DX máximo)
+     * Nota: 65535 * 1000 = 65,535,000 que cabe en unsigned long 32-bit (max: 4,294,967,295)
      */
     if (milliseconds > 65535) {
         milliseconds = 65535;
     }
     
-    microseconds = milliseconds * 1000UL;
+    microseconds = milliseconds * 1000UL;  /* Safe: max 65,535,000 < 2^32 */
     cx = (microseconds >> 16) & 0xFFFF;  /* High word */
     dx = microseconds & 0xFFFF;           /* Low word */
     
