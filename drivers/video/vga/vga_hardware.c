@@ -230,14 +230,16 @@ VOID VgaHardwareReset(VOID)
     /* Step 6: Reset Miscellaneous Output Register to default
      * This controls I/O address selection and sync polarities
      * 0x63 = bit0: I/O @ 3Dx (not 3Bx), bit1: RAM enabled, 
-     *        bit5: Vsync-, bit6: Hsync-, bits2-3: clock select */
-    outb(VGA_MISC_WRITE, 0x63);  /* Default: I/O at 3Dx, RAM enabled, clocks */
+     *        bits2-3: 25MHz dot clock, bit5: Vsync-, bit6: Hsync- */
+    outb(VGA_MISC_WRITE, 0x63);
     
     /* Step 7: Initialize Sequencer for standard operation */
     VgaWriteSequencer(1, 0x00);  /* Clocking Mode: standard */
     VgaWriteSequencer(2, 0x0F);  /* Map Mask: all planes enabled */
     VgaWriteSequencer(3, 0x00);  /* Character Map Select: default */
-    VgaWriteSequencer(4, 0x02);  /* Memory Mode: bit1=extended mem, bit2=0 no odd/even, bit3=0 no chain4 */
+    /* Memory Mode: 0x02 = bit1 set (extended memory enabled), 
+     * bit2 clear (odd/even disabled), bit3 clear (Chain 4 disabled) */
+    VgaWriteSequencer(4, 0x02);
     
     /* Final flip-flop reset before returning */
     inb(VGA_INPUT_STATUS_1);
