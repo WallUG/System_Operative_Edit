@@ -116,17 +116,12 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Sistema de I/O inicializado");
 
-    /* Desactivar interrupciones durante la init del VGA.
-     * IRQ 12 (mouse) e IRQ 1 (teclado) pueden llegar mientras
-     * VgaInitializeDevice programa los registros del AC/Sequencer,
-     * corrompiendo el flip-flop del Attribute Controller.
-     * El STI al final de este bloque las reactiva. */
-    __asm__ volatile("cli");
+    /* IRQ12 se enmascara en el PIC directamente dentro de VgaSetMode()
+     * para proteger los registros VGA sensibles al timing (AC flip-flop).
+     * No se usa cli/sti aqui para no bloquear el timer del scheduler. */
     if (!NT_SUCCESS(IoCreateDriver(&driverName, VgaDriverEntry))) {
-        __asm__ volatile("sti");
         kernel_panic("Failed to load VGA driver");
     }
-    __asm__ volatile("sti");
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Driver VGA 640x480x16 cargado");
 
@@ -181,12 +176,9 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Gestor de procesos inicializado");
 
-    __asm__ volatile("cli");
     if (!NT_SUCCESS(HalInitializeDisplay())) {
-        __asm__ volatile("sti");
         kernel_panic("Failed to initialize display");
     }
-    __asm__ volatile("sti");
 
     /* Inicializar mouse ANTES de crear el proceso GUI */
     MouseInit();

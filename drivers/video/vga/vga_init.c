@@ -102,12 +102,39 @@ static const UCHAR ac_regs[] = {
     0x00,   /* [20] Color Select */
 };
 
+/* Helpers para enmascarar/desenmascarar IRQ12 (mouse) en el PIC slave
+ * durante la programacion de registros VGA sensibles al timing.
+ * IRQ12 interrumpiendo entre dos outb del AC (flip-flop) corrompe el modo. */
+static inline void irq12_mask(void)
+{
+    /* PIC slave data port = 0xA1. Leer mascara actual, poner bit4 (IRQ12) */
+    uint8_t mask;
+    __asm__ volatile("inb $0xA1, %0" : "=a"(mask));
+    mask |= 0x10;  /* bit4 = IRQ12 */
+    __asm__ volatile("outb %0, $0xA1" :: "a"(mask));
+}
+static inline void irq12_unmask(void)
+{
+    uint8_t mask;
+    __asm__ volatile("inb $0xA1, %0" : "=a"(mask));
+    mask &= ~0x10;  /* limpiar bit4 = IRQ12 */
+    __asm__ volatile("outb %0, $0xA1" :: "a"(mask));
+}
+
 NTSTATUS VgaSetMode(UCHAR Mode)
 {
     int i;
 
     if (Mode == VGA_MODE_GRAPHICS_640x480x16)
     {
+        /* ENMASCARAR IRQ12 (mouse PS/2) en el PIC antes de tocar registros VGA.
+         * El handler de IRQ12 llama MouseRead() que hace inb(0x3DA) —
+         * ese inb resetea el flip-flop del Attribute Controller.
+         * Si IRQ12 llega entre el outb(AC_INDEX, i) y outb(AC_WRITE, val),
+         * el AC queda desfasado y el modo grafico se corrompe completamente.
+         * cli solo no es suficiente si el timer hace sti internamente. */
+        irq12_mask();
+
         /* 0. COMPLETE HARDWARE RESET
          *    Perform full VGA hardware reset to clear any inconsistent state
          *    left by bootloader (Mode 13h or text mode). This ensures all
@@ -161,6 +188,9 @@ NTSTATUS VgaSetMode(UCHAR Mode)
 
         /* 8. Paleta de colores estandar */
         VgaInitializePalette();
+
+        /* Desenmascarar IRQ12 ahora que el modo esta completamente configurado */
+        irq12_unmask();
 
         return STATUS_SUCCESS;
     }
