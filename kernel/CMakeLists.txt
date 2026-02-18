@@ -13,6 +13,9 @@ add_library(kernel OBJECT
     ../drivers/video/vga/vga_hardware.c
     ../drivers/video/vga/vga_screen.c
     ../drivers/video/vga/vga_operations.c
+    ../drivers/video/vga/vga_font.c
+    ../drivers/video/vga/vga_mouse.c
+    ../drivers/video/vga/vga_gui.c
     ../lib/memory.c
 )
 

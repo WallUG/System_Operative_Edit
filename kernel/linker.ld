@@ -1,34 +1,33 @@
-/* Linker script para el kernel
- * Define la disposición de memoria del kernel
- */
+ENTRY(start)
 
-/* Punto de entrada del kernel */
-ENTRY(_start)
-
-/* Secciones de memoria */
 SECTIONS
 {
-    /* El kernel se carga en 1MB (dirección física) */
+    /* Kernel cargado en 1MB */
     . = 1M;
 
-    /* Sección de código */
     .text ALIGN(4K) : {
+        *(.multiboot)   /* header multiboot va primero */
         *(.text)
     }
 
-    /* Sección de datos de solo lectura */
     .rodata ALIGN(4K) : {
         *(.rodata)
     }
 
-    /* Sección de datos inicializados */
     .data ALIGN(4K) : {
         *(.data)
     }
 
-    /* Sección de datos no inicializados (BSS) */
     .bss ALIGN(4K) : {
+        _bss_start = .;
         *(COMMON)
         *(.bss)
+        _bss_end = .;
     }
+
+    /* Stack al final, alineado, bien separado del kernel */
+    . = ALIGN(4K);
+    _stack_bottom = .;
+    . += 0x8000;    /* 32 KB de stack */
+    _stack_top = .;
 }
