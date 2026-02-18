@@ -18,19 +18,53 @@
 #include "include/video.h"
 #include "include/boot_animation.h"
 
-/* Delay simple usando bucle ocupado (para animaciones) */
-/* NOTA: Este es un delay aproximado que varía según la velocidad del CPU.
- * No es preciso y solo se usa para transiciones visuales.
- * En hardware real, el tiempo puede variar significativamente.
+/*
+ * delay - Espera precisa usando BIOS Wait Service
+ * 
+ * Usa INT 15h AH=86h (BIOS Wait Service) para timing preciso basado en hardware.
+ * Este método usa el PIT (Programmable Interval Timer) del sistema, proporcionando
+ * delays consistentes independientemente de la velocidad del CPU.
+ * 
+ * @milliseconds: Tiempo a esperar en milisegundos
+ * 
+ * BIOS INT 15h, AH=86h: Wait
+ * Entrada:
+ *   AH = 86h
+ *   CX:DX = Intervalo en microsegundos (32-bit: CX=high word, DX=low word)
+ * 
+ * Ventajas sobre busy-wait loop:
+ * - Timing preciso independiente de CPU
+ * - Usa hardware PIT timer
+ * - Funciona consistentemente en emuladores (VirtualBox, QEMU)
+ * - Soluciona problemas de sincronización VGA
+ * 
+ * Soluciona: Barras de colores aleatorias durante boot en emuladores
+ * debido a timing insuficiente en inicialización de modo VGA
  */
 static void delay(u32 milliseconds)
 {
-    /* Aproximadamente 1ms por cada 50000 iteraciones en CPU moderna típica */
-    /* Este valor es solo una estimación y puede requerir ajuste */
-    volatile u32 count = milliseconds * 50000;
-    while (count--) {
-        __asm__ volatile ("nop");
-    }
+    unsigned long microseconds = milliseconds * 1000UL;
+    unsigned int cx = (microseconds >> 16) & 0xFFFF;  /* High word */
+    unsigned int dx = microseconds & 0xFFFF;           /* Low word */
+    
+    /*
+     * INT 15h, AH=86h: Wait (BIOS Wait Service)
+     * Este servicio usa el hardware PIT para timing preciso.
+     * Es el método estándar usado por ReactOS, GRUB y otros bootloaders.
+     */
+    __asm__ volatile (
+        "int $0x15"
+        :                                    /* No output */
+        : "a"(0x8600), "c"(cx), "d"(dx)     /* Input: AH=86h, CX:DX=microseconds */
+        : "cc"                               /* Clobbers: condition codes */
+    );
+    
+    /*
+     * Nota: No hay fallback explícito aquí porque:
+     * 1. INT 15h AH=86h está disponible desde 80286+ (prácticamente universal)
+     * 2. Si falla, simplemente retorna inmediatamente (no es crítico)
+     * 3. El sistema continuará funcionando, solo sin delay
+     */
 }
 
 /*
