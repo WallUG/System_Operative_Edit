@@ -36,7 +36,9 @@ static const UCHAR seq_regs[] = {
     0x01,   /* [1] Clocking Mode: 8 dot/char, bit3=0(NO Shift4), bit4=0(NO Shift Load) */
     0x0F,   /* [2] Map Mask: all planes enabled */
     0x00,   /* [3] Character Map Select */
-    0x06,   /* [4] Memory Mode: chain4 off, odd/even off, extended mem */
+    0x06,   /* [4] Memory Mode: bit1=extended mem, bit2=0 odd/even off, bit3=0 chain4 OFF
+             * IMPORTANTE: 0x06 = solo extended memory. chain4(bit3) DEBE estar 0
+             * para modo planar 16-color. Si chain4=1 produce lineas verticales. */
 };
 
 /* CRTC registers [index] = value */
@@ -50,7 +52,9 @@ static const UCHAR crtc_regs[] = {
     0x0B,   /* [6]  Vertical Total: 0x0B correcto para 640x480x16 (modo 0x12) */
     0x3E,   /* [7]  Overflow */
     0x00,   /* [8]  Preset Row Scan */
-    0x40,   /* [9]  Max Scan Line */
+    0x00,   /* [9]  Max Scan Line: 0x00 = sin line doubling ni scan doubling
+             * CRITICO: 0x40 activaba bit6 (line doubling) que causa lineas
+             * verticales en modo 640x480x16. Debe ser 0x00. */
     0x00,   /* [10] Cursor Start */
     0x00,   /* [11] Cursor End */
     0x00,   /* [12] Start Address High */
@@ -118,10 +122,16 @@ NTSTATUS VgaSetMode(UCHAR Mode)
         /* 2. Miscellaneous Output Register */
         outb_vga(VGA_MISC_WRITE, 0xE3);
 
-        /* 3. Sequencer */
-        for (i = 0; i < 5; i++) {
-            VgaWriteSequencer((UCHAR)i, seq_regs[i]);
+        /* 3. Sequencer
+         * SECUENCIA CORRECTA: poner en reset (0x01) ANTES de programar
+         * los registros 1-4, luego liberar con 0x03 al final.
+         * Programar con el Sequencer activo deja el VGA en estado indefinido
+         * despues de una boot animation que modifico los registros. */
+        VgaWriteSequencer(0x00, 0x01);          /* Sync reset: detener Sequencer */
+        for (i = 1; i < 5; i++) {
+            VgaWriteSequencer((UCHAR)i, seq_regs[i]); /* Programar regs 1-4 */
         }
+        VgaWriteSequencer(0x00, 0x03);          /* Liberar reset: operacion normal */
 
         /* 4. CRTC */
         for (i = 0; i < 25; i++) {

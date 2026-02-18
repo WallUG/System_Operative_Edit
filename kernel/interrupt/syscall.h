@@ -33,8 +33,12 @@
  *   0x02  SYS_DRAW_PIXEL   — dibujar un pixel (x, y, color)
  *   0x03  SYS_FILL_RECT    — rellenar rectangulo (x, y, w, h, color)
  *   0x04  SYS_DRAW_STRING  — dibujar texto (x, y, str_phys, fg, bg)
- *   0x05  SYS_GET_TICK     — obtener tick counter del kernel
- *   0x06  SYS_GET_MOUSE    — obtener estado del mouse (ptr a struct)
+ *   0x05  SYS_GET_TICK       — obtener tick counter del kernel
+ *   0x06  SYS_GET_MOUSE      — DEPRECATED: devuelve ptr kernel (solo Ring 0)
+ *   0x07  SYS_GET_MOUSE_STATE — copia el MOUSE_STATE por valor a un buffer
+ *                               de usuario (seguro desde Ring 3)
+ *                               EBX = ptr destino en espacio de usuario
+ *                               Retorna SYSCALL_OK o SYSCALL_ERR
  */
 #ifndef _SYSCALL_H
 #define _SYSCALL_H
@@ -49,9 +53,10 @@
 #define SYS_FILL_RECT   0x03
 #define SYS_DRAW_STRING 0x04
 #define SYS_GET_TICK    0x05
-#define SYS_GET_MOUSE   0x06
+#define SYS_GET_MOUSE        0x06   /* DEPRECATED — solo Ring 0 */
+#define SYS_GET_MOUSE_STATE  0x07   /* Ring 3 seguro: copia por valor */
 
-#define SYSCALL_COUNT   7
+#define SYSCALL_COUNT   8
 
 /* Valor de retorno de error genérico */
 #define SYSCALL_ERR   ((uint32_t)(-1))

@@ -1,5 +1,6 @@
 add_library(kernel OBJECT
     main.c
+    boot_splash.c
     screen.c
     hal/hal.c
     mm/mm.c

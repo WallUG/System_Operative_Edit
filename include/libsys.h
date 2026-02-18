@@ -27,7 +27,8 @@
 #define SYS_FILL_RECT   0x03
 #define SYS_DRAW_STRING 0x04
 #define SYS_GET_TICK    0x05
-#define SYS_GET_MOUSE   0x06
+#define SYS_GET_MOUSE        0x06   /* DEPRECATED — solo Ring 0 */
+#define SYS_GET_MOUSE_STATE  0x07   /* Ring 3 seguro: copia por valor */
 
 /* Estado del mouse (misma estructura que el kernel) */
 typedef struct {
@@ -111,6 +112,7 @@ static inline uint32_t sys_get_tick(void)
     return ret;
 }
 
+/* DEPRECATED: devuelve puntero al kernel — seguro solo en Ring 0 */
 static inline SYS_MOUSE* sys_get_mouse(void)
 {
     uint32_t ret;
@@ -121,6 +123,29 @@ static inline SYS_MOUSE* sys_get_mouse(void)
         : "memory"
     );
     return (SYS_MOUSE*)ret;
+}
+
+/*
+ * sys_get_mouse_state — versión segura para Ring 3.
+ *
+ * Copia el MOUSE_STATE por valor a un buffer local del proceso.
+ * El kernel valida que el puntero destino está en el espacio de usuario
+ * antes de escribir, por lo que es seguro desde Ring 3.
+ *
+ * Uso:
+ *   SYS_MOUSE ms;
+ *   if (sys_get_mouse_state(&ms) == 0) { ... usa ms.x, ms.y ... }
+ */
+static inline uint32_t sys_get_mouse_state(SYS_MOUSE* out)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "int $0x30"
+        : "=a"(ret)
+        : "a"(SYS_GET_MOUSE_STATE), "b"(out)
+        : "memory"
+    );
+    return ret;
 }
 
 #endif /* _LIBSYS_H */

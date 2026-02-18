@@ -26,8 +26,87 @@ extern void  VgaDrawString(int x, int y, const char* str,
                             unsigned char fg, unsigned char bg);
 
 /* Mouse */
-typedef struct { int x; int y; int buttons; } MOUSE_STATE;
+typedef struct { int x; int y; int buttons; int visible; } MOUSE_STATE;
 extern MOUSE_STATE* MouseGetState(void);
+
+/* ── Validación de punteros de usuario ──────────────────────────────────
+ *
+ * En v0.4, el proceso GUI corre en Ring 3 pero su código y datos estáticos
+ * viven físicamente en el espacio del kernel (compilado junto con él).
+ * Su page directory mapea 0x00000000..0x07FFFFFF con PTE_USER, por lo que
+ * cualquier puntero en ese rango es accesible y válido desde Ring 3.
+ *
+ * REGLA DE VALIDACION:
+ *   - Un puntero es válido si cae en cualquiera de estos rangos:
+ *     a) 0x00001000..0x07FFFFFF  (kernel/GUI mapeado con PTE_USER)
+ *     b) USER_STACK_BOT..USER_STACK_TOP (stack de usuario Ring 3)
+ *   - Rechazamos NULL y la página 0 (null guard).
+ *   - Rechazamos punteros al kernel sin mapeo de usuario (>= 0x08000000
+ *     y < 0x7FF00000), que serían un intento de acceder a estructuras
+ *     del kernel no mapeadas como PTE_USER.
+ *
+ * NOTA: Esta validación es suficiente para el proyecto. En producción
+ * se recorrerían las page tables para verificar que PTE_USER está activo.
+ */
+
+/* Rango a): kernel/GUI mapeado con PTE_USER */
+#define KERNEL_USER_MAP_END  0x08000000u   /* fin del rango identity-mapped */
+/* Rango b): stack de usuario */
+#define USER_STACK_BOT       0x7FEF0000u   /* USER_STACK_TOP - USER_STACK_SIZE */
+#define USER_STACK_TOP_ADDR  0x7FFF0000u
+/* Zona prohibida: entre el mapa del kernel y el stack de usuario */
+#define FORBIDDEN_LOW        0x08000000u
+#define FORBIDDEN_HIGH       0x7FEF0000u
+
+/* puntero de escritura: solo en stack de usuario (no en .rodata del kernel) */
+static inline int user_write_ptr_valid(const void* ptr, uint32_t size)
+{
+    uint32_t addr = (uint32_t)ptr;
+    if (!ptr)                               return 0;   /* NULL */
+    if (addr < USER_STACK_BOT)              return 0;   /* fuera del stack */
+    if (addr >= USER_STACK_TOP_ADDR)        return 0;   /* pasado el tope */
+    if (addr + size < addr)                 return 0;   /* overflow */
+    if (addr + size > USER_STACK_TOP_ADDR)  return 0;   /* desborda */
+    return 1;
+}
+
+/* puntero de lectura: permite tanto el rango del kernel (PTE_USER) como el stack */
+static inline int user_read_ptr_valid(const void* ptr, uint32_t size)
+{
+    uint32_t addr = (uint32_t)ptr;
+    if (!ptr) return 0;   /* NULL */
+    if (addr < 0x00001000u) return 0;   /* null guard (primera página) */
+    if (addr + size < addr) return 0;   /* overflow */
+    /* Rango a): 0x00001000..0x07FFFFFF mapeado con PTE_USER */
+    if (addr >= 0x00001000u && (addr + size) <= KERNEL_USER_MAP_END)
+        return 1;
+    /* Rango b): stack de usuario */
+    if (addr >= USER_STACK_BOT && (addr + size) <= USER_STACK_TOP_ADDR)
+        return 1;
+    return 0;   /* zona no mapeada o kernel puro */
+}
+
+/* Longitud máxima de string permitida desde usuario */
+#define USER_STR_MAX  1024
+
+static int user_str_valid(const char* s)
+{
+    if (!user_read_ptr_valid(s, 1)) return 0;
+    /* Verificar que el string termina dentro del rango permitido */
+    const char* p = s;
+    int n = 0;
+    while (n < USER_STR_MAX) {
+        /* Verificar que el byte actual es accesible */
+        if (!user_read_ptr_valid(p, 1)) return 0;
+        if (*p == '\0') return 1;
+        p++;
+        n++;
+    }
+    return 0;   /* string demasiado largo */
+}
+
+/* Alias legacy para SYS_GET_MOUSE_STATE (escribe en stack de usuario) */
+#define user_ptr_valid(ptr, size) user_write_ptr_valid(ptr, size)
 
 /* Tick counter global (incrementado en cada IRQ0) */
 extern volatile uint32_t g_kernel_ticks;
@@ -153,17 +232,17 @@ void syscall_dispatch(cpu_context_t* ctx)
     /* ── SYS_DRAW_STRING (0x04) ─────────────────────────────────────── */
     /* args: EBX=x, ECX=y, EDX=ptr_str (addr virtual usuario), ESI=fg, EDI=bg
      *
-     * SEGURIDAD: en v0.3 el proceso GUI corre en Ring 0 con el mismo
-     * page directory del kernel, por lo que EDX es una dirección válida.
-     * En v0.4 (Ring 3 real) habrá que validar que EDX apunte al espacio
-     * de usuario antes de desreferenciar. */
+     * SEGURIDAD Ring 3: validamos que el puntero EDX apunte al espacio
+     * de usuario antes de desreferenciar. Si no es válido, retornamos
+     * SYSCALL_ERR sin tocar el hardware. */
     case SYS_DRAW_STRING: {
         int x        = (int)ctx_ebx(ctx);
         int y        = (int)ctx_ecx(ctx);
         const char*s = (const char*)ctx_edx(ctx);
         uint8_t fg   = (uint8_t)ctx_esi(ctx);
         uint8_t bg   = (uint8_t)ctx_edi(ctx);
-        if (s) {
+        /* Validar puntero antes de desreferenciar desde Ring 0 */
+        if (user_str_valid(s)) {
             VgaDrawString(x, y, s, fg, bg);
             ret = SYSCALL_OK;
         }
@@ -177,10 +256,31 @@ void syscall_dispatch(cpu_context_t* ctx)
     }
 
     /* ── SYS_GET_MOUSE (0x06) ───────────────────────────────────────── */
-    /* Retorna puntero al MOUSE_STATE del kernel.
-     * El proceso puede leerlo porque ambos usan el mismo page directory. */
+    /* DEPRECATED: retorna puntero directo al kernel — solo seguro desde Ring 0.
+     * Mantenido por compatibilidad pero no debe usarse desde Ring 3. */
     case SYS_GET_MOUSE: {
         ret = (uint32_t)MouseGetState();
+        break;
+    }
+
+    /* ── SYS_GET_MOUSE_STATE (0x07) ────────────────────────────────────── */
+    /* Copia el MOUSE_STATE por valor al buffer de usuario apuntado por EBX.
+     * SEGURO desde Ring 3: validamos el puntero destino antes de escribir.
+     * args: EBX = ptr destino (en espacio de usuario, sizeof MOUSE_STATE bytes)
+     * Retorna SYSCALL_OK si se copió, SYSCALL_ERR si el puntero no es válido. */
+    case SYS_GET_MOUSE_STATE: {
+        MOUSE_STATE* dst = (MOUSE_STATE*)ctx_ebx(ctx);
+        if (!user_ptr_valid(dst, sizeof(MOUSE_STATE))) {
+            ret = SYSCALL_ERR;
+            break;
+        }
+        MOUSE_STATE* src = MouseGetState();
+        /* Copiar campo a campo (no tenemos memcpy en el kernel por ahora) */
+        dst->x       = src->x;
+        dst->y       = src->y;
+        dst->buttons = src->buttons;
+        dst->visible = src->visible;
+        ret = SYSCALL_OK;
         break;
     }
 

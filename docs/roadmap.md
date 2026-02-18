@@ -4,13 +4,16 @@ Este documento describe el plan de desarrollo del sistema operativo personalizad
 
 ## Estado Actual
 
-| Version | Estado     | Descripcion                                      |
-|---------|------------|--------------------------------------------------|
-| v0.1    | ✅ COMPLETO | GUI basica, VGA 640x480x16, mouse PS/2, PIC 8259 |
-| v0.2    | ✅ COMPLETO | PMM + VMM (paginacion) + Scheduler Round-Robin   |
-| v0.3    | 🔲 PENDIENTE| Syscalls (INT 0x30) + proceso GUI en Ring 3      |
-| v0.4    | 🔲 PENDIENTE| Sistema de archivos FAT12 (leer ISO)             |
-| v0.5    | 🔲 PENDIENTE| Shell basico + primer proceso de usuario         |
+| Version | Estado     | Descripcion                                                    |
+|---------|------------|----------------------------------------------------------------|
+| v0.1    | ✅ COMPLETO | GUI basica, VGA 640x480x16, mouse PS/2, PIC 8259               |
+| v0.2    | ✅ COMPLETO | PMM + VMM (paginacion) + Scheduler Round-Robin                 |
+| v0.3    | ✅ COMPLETO | Syscalls (INT 0x30) + validacion de punteros de usuario        |
+| v0.4    | ✅ COMPLETO | GUI en Ring 3 real (CS=0x1B, proc. separado, mouse por valor)  |
+| v0.4.1  | ✅ COMPLETO | Boot splash real (VGA 13h por puertos, sin BIOS, en kernel.elf)|
+| v0.5    | 🔲 PENDIENTE| Teclado PS/2 + buffer + scancode-to-ASCII                      |
+| v0.6    | 🔲 PENDIENTE| Sistema de archivos FAT12 (leer ISO)                           |
+| v0.7    | 🔲 PENDIENTE| Shell basico + kernel en mitad alta (separacion real)          |
 
 ## v0.2 — Separacion de responsabilidades (COMPLETADO)
 

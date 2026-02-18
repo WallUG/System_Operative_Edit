@@ -286,6 +286,44 @@ __asm__(
     "  iret\n"
 );
 
+/*
+ * IRQ12 - Mouse PS/2 (IRQ del PIC esclavo, bit 4)
+ *
+ * En v0.4, GuiMainLoop corre en Ring 3 y ya no puede llamar a MouseRead()
+ * directamente. El kernel debe actualizar el estado del mouse el solo,
+ * desde este handler de interrupcion.
+ *
+ * MouseRead(NULL): pasa NULL para que la funcion solo actualice g_mouse
+ * interno sin copiar a ningun buffer externo. La syscall SYS_GET_MOUSE_STATE
+ * luego copia ese estado al proceso de usuario cuando este lo pida.
+ *
+ * EOI debe enviarse TANTO al slave (IRQ12 = IRQ8+4) COMO al master (cascade).
+ */
+typedef struct { int x; int y; int buttons; int visible; } MOUSE_STATE_IRQ;
+extern void MouseRead(MOUSE_STATE_IRQ* state);
+
+void irq12_mouse_handler_c(void);
+void irq12_mouse_handler_c(void)
+{
+    MouseRead(0);   /* actualiza estado interno; NULL = no copiar afuera */
+    /* EOI al slave primero, luego al master */
+    outb_idt(PIC2_CMD, PIC_EOI);
+    outb_idt(PIC1_CMD, PIC_EOI);
+}
+
+void irq12_mouse_handler(void);
+__asm__(
+    ".global irq12_mouse_handler\n"
+    "irq12_mouse_handler:\n"
+    "  pusha\n"
+    "  movw $0x10, %ax\n"
+    "  movw %ax, %ds\n"
+    "  movw %ax, %es\n"
+    "  call irq12_mouse_handler_c\n"
+    "  popa\n"
+    "  iret\n"
+);
+
 /* ═══════════════════════════════════════════════════════
  * Helpers IDT
  * ═══════════════════════════════════════════════════════ */
@@ -341,13 +379,28 @@ void idt_init(void)
     for (i = 0x22; i <= 0x2F; i++) {
         idt_set_gate((uint8_t)i, (uint32_t)irq_generic_handler, 0x08, 0x8E);
     }
+    /* IRQ12 = INT 0x2C (IRQ8 + 4, slave del PIC): mouse PS/2 */
+    idt_set_gate(0x2C, (uint32_t)irq12_mouse_handler, 0x08, 0x8E);
 
     /* 6. Cargar IDT */
     __asm__ volatile("lidt %0" :: "m"(idtp));
 
-    /* El PIC tiene todas las IRQ enmascaradas (0xFF).
-     * Desenmascaramos solo IRQ0 (timer) para que el sistema siga vivo.
-     * IRQ1 (teclado/mouse PS/2) se habilitara cuando el driver lo necesite. */
-    outb_idt(PIC1_DATA, 0xFE);  /* 0xFE = 11111110 → solo IRQ0 activa */
-    outb_idt(PIC2_DATA, 0xFF);  /* Slave completo enmascarado */
+    /*
+     * PIC masks:
+     *   Master (0x21): 0xF9 = 11111001
+     *     bit0=0 → IRQ0 (timer) activa
+     *     bit1=0 → IRQ1 (teclado/PS2) activa  — necesario para IRQ12 cascade
+     *     bit2=0 → IRQ2 (cascade slave) activa — OBLIGATORIO para recibir IRQ8-15
+     *     resto  → enmascarado
+     *
+     *   Slave (0xA1): 0xEF = 11101111
+     *     bit4=0 → IRQ12 (mouse PS/2) activa
+     *     resto  → enmascarado
+     *
+     *   NOTA: IRQ2 (bit2 del master) debe estar desenmascarado para que
+     *   el PIC slave pueda entregar IRQs al master via la linea cascade.
+     *   Sin esto, IRQ12 llega al slave pero nunca pasa al master → CPU.
+     */
+    outb_idt(PIC1_DATA, 0xF9);  /* 11111001 → IRQ0 (timer) + IRQ1 (kbd) + IRQ2 (cascade) */
+    outb_idt(PIC2_DATA, 0xEF);  /* 11101111 → IRQ12 (mouse) activa en slave */
 }

@@ -8,6 +8,7 @@
 #include "proc/scheduler.h"
 #include "interrupt/tss.h"
 #include "interrupt/syscall.h"
+#include "boot_splash.h"
 
 /* Forward declarations */
 extern void gdt_init(void);
@@ -54,9 +55,25 @@ void kernel_halt(void)
 
 void kernel_main(uint32_t magic, multiboot_info_t* mbi)
 {
-    /* Initialize GDT and IDT FIRST - prevents triple fault */
+    /*
+     * GDT e IDT PRIMERO — obligatorio antes de cualquier otra cosa.
+     *
+     * KernelShowBootSplash() usaba acceso directo a puertos VGA (sin INT 0x10),
+     * por lo que NO necesita estar antes de la GDT/IDT.
+     * Llamarla antes causaba triple fault: la IDT de GRUB tiene limite 0 en
+     * el contexto del kernel, cualquier interrupcion durante la animacion
+     * (timer, teclado) genera un page fault sin handler -> reset.
+     */
     gdt_init();
     idt_init();
+
+    /*
+     * ANIMACION DE BOOT — ahora seguro despues de GDT/IDT.
+     * Las interrupciones siguen desactivadas (cli en boot.asm),
+     * por lo que la animacion corre sin interferencia del timer/teclado.
+     * La boot animation usa puertos I/O directos, no INT 0x10.
+     */
+    KernelShowBootSplash();
 
     /* Enable interrupts after IDT is set */
     __asm__ volatile("sti");
@@ -99,9 +116,17 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Sistema de I/O inicializado");
 
+    /* Desactivar interrupciones durante la init del VGA.
+     * IRQ 12 (mouse) e IRQ 1 (teclado) pueden llegar mientras
+     * VgaInitializeDevice programa los registros del AC/Sequencer,
+     * corrompiendo el flip-flop del Attribute Controller.
+     * El STI al final de este bloque las reactiva. */
+    __asm__ volatile("cli");
     if (!NT_SUCCESS(IoCreateDriver(&driverName, VgaDriverEntry))) {
+        __asm__ volatile("sti");
         kernel_panic("Failed to load VGA driver");
     }
+    __asm__ volatile("sti");
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Driver VGA 640x480x16 cargado");
 
@@ -156,9 +181,12 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Gestor de procesos inicializado");
 
+    __asm__ volatile("cli");
     if (!NT_SUCCESS(HalInitializeDisplay())) {
+        __asm__ volatile("sti");
         kernel_panic("Failed to initialize display");
     }
+    __asm__ volatile("sti");
 
     /* Inicializar mouse ANTES de crear el proceso GUI */
     MouseInit();
@@ -172,10 +200,16 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Syscalls INT 0x30 registradas (DPL=3)");
 
-    proc_create_kernel("gui_server", GuiMainLoop);
+    /*
+     * v0.4: Crear el proceso GUI en Ring 3 real.
+     * proc_create_user_gui() mapea el kernel con PTE_USER, crea un page
+     * directory propio y construye el frame de IRET con CS=0x1B (Ring 3).
+     * El GUI corre con CPL=3 y solo puede llamar al kernel via INT 0x30.
+     */
+    proc_create_user_gui("gui_server", GuiMainLoop);
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    screen_writeln("[OK] Proceso gui_server creado (PID 1)");
-    screen_writeln("     -> Usa syscalls via INT 0x30");
+    screen_writeln("[OK] Proceso gui_server creado en Ring 3 (PID 1)");
+    screen_writeln("     -> CS=0x1B SS=0x23 CPL=3 / syscalls INT 0x30");
 
     /* Inicializar el scheduler.
      * proc_create_kernel() ya llamo scheduler_add_thread() internamente

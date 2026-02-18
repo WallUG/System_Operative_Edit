@@ -1,38 +1,105 @@
 /*
  * vga_gui.c — GUI tipo Windows que usa syscalls para dibujar
  *
- * CAMBIO v0.3: En lugar de llamar directamente a VgaPutPixel/VgaFillRect,
- * ahora usa sys_fill_rect / sys_draw_string via INT 0x30.
+ * v0.4 (Ring 3 real):
+ *   - El proceso GUI corre en Ring 3 con su propio espacio de direcciones.
+ *   - TODA comunicacion con el kernel ocurre via INT 0x30.
+ *   - NO se llama a ninguna función del kernel directamente.
+ *   - MouseRead() fue eliminada: el estado del mouse se obtiene por valor
+ *     con sys_get_mouse_state(), que copia al buffer de usuario.
+ *   - MouseDraw/MouseErase fueron eliminadas: el cursor se dibuja via
+ *     syscalls SYS_DRAW_PIXEL desde el espacio de usuario.
  *
- * Esto simula la separacion Ring 3 ↔ Ring 0:
- *   - El proceso GUI (Ring 3 en el futuro) NO toca el hardware directamente
- *   - Todo pasa por el kernel via syscall
- *   - El kernel valida y ejecuta el dibujo
- *
- * En v0.3 el proceso corre en Ring 0 con paginacion activa, pero ya
- * usa la interfaz correcta. En v0.4 bastara cambiar proc_create_kernel
- * por proc_create_user y todo seguira funcionando sin cambios aqui.
+ * INVARIANTE: Este archivo NO debe incluir ningun header del kernel
+ * excepto libsys.h y los propios de vga_gui.
  */
 #include "vga_gui.h"
 #include <libsys.h>
 
-/* Colores VGA (deben coincidir con vga.h) */
-#define VGA_COLOR_BLACK        0
-#define VGA_COLOR_BLUE         1
-#define VGA_COLOR_GREEN        2
-#define VGA_COLOR_CYAN         3
-#define VGA_COLOR_RED          4
-#define VGA_COLOR_MAGENTA      5
-#define VGA_COLOR_BROWN        6
-#define VGA_COLOR_LIGHT_GRAY   7
-#define VGA_COLOR_DARK_GRAY    8
-#define VGA_COLOR_LIGHT_BLUE   9
-#define VGA_COLOR_LIGHT_GREEN  10
-#define VGA_COLOR_LIGHT_CYAN   11
-#define VGA_COLOR_LIGHT_RED    12
+/* Colores VGA — deben definirse ANTES de cualquier uso */
+#define VGA_COLOR_BLACK         0
+#define VGA_COLOR_BLUE          1
+#define VGA_COLOR_GREEN         2
+#define VGA_COLOR_CYAN          3
+#define VGA_COLOR_RED           4
+#define VGA_COLOR_MAGENTA       5
+#define VGA_COLOR_BROWN         6
+#define VGA_COLOR_LIGHT_GRAY    7
+#define VGA_COLOR_DARK_GRAY     8
+#define VGA_COLOR_LIGHT_BLUE    9
+#define VGA_COLOR_LIGHT_GREEN   10
+#define VGA_COLOR_LIGHT_CYAN    11
+#define VGA_COLOR_LIGHT_RED     12
 #define VGA_COLOR_LIGHT_MAGENTA 13
-#define VGA_COLOR_YELLOW       14
-#define VGA_COLOR_WHITE        15
+#define VGA_COLOR_YELLOW        14
+#define VGA_COLOR_WHITE         15
+
+/* ── Cursor del mouse en modo Ring 3 ────────────────────────────────
+ * En Ring 3 no podemos llamar a MouseDraw/MouseErase del driver VGA
+ * (esas funciones usan VgaPutPixel directo). En su lugar redibujamos
+ * el cursor con syscalls SYS_DRAW_PIXEL.
+ *
+ * El fondo del cursor se guarda en un buffer local (espacio de usuario).
+ * Los colores son indices VGA iguales a los del driver.
+ */
+
+#define MOUSE_W  8
+#define MOUSE_H  12
+
+/* Bitmap del cursor: 1=blanco, 2=negro(borde), 0=transparente */
+static const unsigned char s_cursor[MOUSE_H][MOUSE_W] = {
+    {1,0,0,0,0,0,0,0},
+    {1,1,0,0,0,0,0,0},
+    {1,2,1,0,0,0,0,0},
+    {1,2,2,1,0,0,0,0},
+    {1,2,2,2,1,0,0,0},
+    {1,2,2,2,2,1,0,0},
+    {1,2,2,2,2,2,1,0},
+    {1,2,2,2,1,1,0,0},
+    {1,2,1,2,1,0,0,0},
+    {1,1,0,1,2,1,0,0},
+    {0,0,0,1,2,1,0,0},
+    {0,0,0,0,1,1,0,0},
+};
+
+/* Fondo guardado bajo el cursor (buffer de usuario) */
+static unsigned char s_cursor_bg[MOUSE_H * MOUSE_W];
+static int s_saved_x = -1;
+static int s_saved_y = -1;
+
+/* Dibujar cursor (no usa función del kernel: usa sys_draw_pixel) */
+static void cursor_draw(int x, int y)
+{
+    int r, c;
+    /* Guardar fondo: en Ring 3 no tenemos acceso al shadow framebuffer
+     * del driver VGA. Inicializamos el fondo al color del desktop (azul)
+     * para que el erase funcione aunque no tengamos lectura de VGA. */
+    for (r = 0; r < MOUSE_H; r++)
+        for (c = 0; c < MOUSE_W; c++)
+            s_cursor_bg[r * MOUSE_W + c] = GUI_COLOR_DESKTOP;
+    s_saved_x = x;
+    s_saved_y = y;
+
+    for (r = 0; r < MOUSE_H; r++) {
+        for (c = 0; c < MOUSE_W; c++) {
+            unsigned char p = s_cursor[r][c];
+            if (p == 1) sys_draw_pixel(x + c, y + r, VGA_COLOR_WHITE);
+            else if (p == 2) sys_draw_pixel(x + c, y + r, VGA_COLOR_BLACK);
+        }
+    }
+}
+
+/* Borrar cursor restaurando el fondo */
+static void cursor_erase(int x, int y)
+{
+    int r, c;
+    if (x < 0 || y < 0) return;
+    for (r = 0; r < MOUSE_H; r++)
+        for (c = 0; c < MOUSE_W; c++)
+            sys_draw_pixel(x + c, y + r, s_cursor_bg[r * MOUSE_W + c]);
+}
+
+/* Colores VGA: ya definidos al inicio del archivo — ver bloque superior */
 
 /* ── Helpers internos ─────────────────────────────────────────────────── */
 
@@ -167,7 +234,7 @@ VOID GuiMainLoop(VOID)
 
     WINDOW welcome = {
         150, 80, 340, 130,
-        "Sistema Operativo UG - v0.3 Syscalls",
+        "Sistema Operativo UG - v0.4 Ring 3",
         1
     };
 
@@ -178,32 +245,31 @@ VOID GuiMainLoop(VOID)
     GuiDrawWindowText(&welcome, 10, 10,
         "Sistema iniciado correctamente.", VGA_COLOR_BLACK);
     GuiDrawWindowText(&welcome, 10, 22,
-        "v0.3: Syscalls INT 0x30 activas.", VGA_COLOR_DARK_GRAY);
+        "v0.4: GUI en Ring 3 real!", VGA_COLOR_BLACK);
     GuiDrawWindowText(&welcome, 10, 34,
-        "Scheduler Round-Robin funcionando.", VGA_COLOR_DARK_GRAY);
+        "Scheduler Round-Robin activo.", VGA_COLOR_DARK_GRAY);
     GuiDrawWindowText(&welcome, 10, 46,
-        "TSS configurado para Ring 3.", VGA_COLOR_DARK_GRAY);
+        "Mouse via syscall por valor.", VGA_COLOR_DARK_GRAY);
+    GuiDrawWindowText(&welcome, 10, 58,
+        "Punteros de usuario validados.", VGA_COLOR_DARK_GRAY);
     GuiDrawButton(welcome.x + 130, welcome.y + 100, 60, 14, "Aceptar", 0);
 
-    /* Cursor inicial */
-    MouseDraw(320, 240);
+    /* Cursor inicial (usando syscalls, sin acceso directo a VGA) */
+    cursor_draw(320, 240);
 
     while (1) {
         /* Ceder CPU al idle entre frames */
         sys_yield();
 
-        /* Actualizar mouse */
-        SYS_MOUSE* ms = sys_get_mouse();
-        if (ms) {
-            /* Leer mouse real via driver (el pointer apunta al estado del kernel) */
-            //extern void MouseRead(void*);
-            MouseRead(ms);
-
-            if (ms->x != prev_x || ms->y != prev_y) {
-                MouseErase(prev_x, prev_y);
-                MouseDraw(ms->x, ms->y);
-                prev_x = ms->x;
-                prev_y = ms->y;
+        /* Actualizar mouse: obtener estado por VALOR (seguro desde Ring 3)
+         * El kernel copia los datos al buffer local 'ms' en espacio de usuario. */
+        SYS_MOUSE ms;
+        if (sys_get_mouse_state(&ms) == 0) {
+            if (ms.x != prev_x || ms.y != prev_y) {
+                cursor_erase(prev_x, prev_y);
+                cursor_draw(ms.x, ms.y);
+                prev_x = ms.x;
+                prev_y = ms.y;
             }
         }
 

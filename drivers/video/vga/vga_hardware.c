@@ -236,15 +236,18 @@ VOID VgaHardwareReset(VOID)
      *        bit5: Vsync-, bit6: Hsync-, bit7: 0 (even page) */
     outb(VGA_MISC_WRITE, 0x63);
     
-    /* Step 7: Initialize Sequencer for standard operation */
-    /* Clocking Mode: 0x01 = 8-dot mode (graphics), no shift load */
-    VgaWriteSequencer(1, 0x01);
+    /* Step 7: Initialize Sequencer for standard/neutral operation.
+     * IMPORTANTE: ponerlo en reset (0x01) mientras se escriben los
+     * registros 1-4, y liberar con 0x03 al final. Esto evita que el
+     * estado residual del modo texto (seq[4]=0x02, odd/even activo)
+     * interfiera con la programacion posterior del modo 640x480x16. */
+    VgaWriteSequencer(0, 0x01);  /* Sync reset */
+    VgaWriteSequencer(1, 0x01);  /* Clocking Mode: 8-dot, no shift */
     VgaWriteSequencer(2, 0x0F);  /* Map Mask: all planes enabled */
     VgaWriteSequencer(3, 0x00);  /* Character Map Select: default */
-    /* Memory Mode: 0x02 = bit1 set (extended memory enabled), 
-     * bit2 clear (odd/even disabled), bit3 clear (Chain 4 disabled) */
-    VgaWriteSequencer(4, 0x02);
-    
+    VgaWriteSequencer(4, 0x06);  /* Memory Mode: extended + chain4 (neutral para graficos) */
+    VgaWriteSequencer(0, 0x03);  /* Liberar reset: operacion normal */
+
     /* Final flip-flop reset before returning */
     inb(VGA_INPUT_STATUS_1);
 }
