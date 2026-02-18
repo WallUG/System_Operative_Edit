@@ -196,7 +196,7 @@ VOID GuiMainLoop(VOID)
         SYS_MOUSE* ms = sys_get_mouse();
         if (ms) {
             /* Leer mouse real via driver (el pointer apunta al estado del kernel) */
-            extern void MouseRead(void*);
+            //extern void MouseRead(void*);
             MouseRead(ms);
 
             if (ms->x != prev_x || ms->y != prev_y) {
