@@ -186,7 +186,8 @@ VOID VgaHardwareReset(VOID)
     outb(VGA_SEQ_INDEX, 0x00);
     outb(VGA_SEQ_DATA, 0x00);   /* Async reset */
     
-    /* Small I/O delay to ensure reset propagates through hardware */
+    /* Small I/O delay to ensure reset propagates through hardware
+     * Port 0x80 is the POST diagnostic port, used for timing delays */
     for (i = 0; i < 5; i++) {
         outb(0x80, 0);
     }
@@ -194,7 +195,7 @@ VOID VgaHardwareReset(VOID)
     outb(VGA_SEQ_INDEX, 0x00);
     outb(VGA_SEQ_DATA, 0x01);   /* Sync reset */
     
-    /* Another delay */
+    /* Another I/O delay (POST diagnostic port) */
     for (i = 0; i < 5; i++) {
         outb(0x80, 0);
     }
