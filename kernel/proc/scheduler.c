@@ -28,7 +28,6 @@
 #include "scheduler.h"
 #include "process.h"
 #include "../mm/vmm.h"
-#include "../interrupt/tss.h"
 #include <types.h>
 
 /* ── Estado del scheduler ─────────────────────────────────────────────── */
@@ -254,13 +253,7 @@ cpu_context_t* scheduler_tick(cpu_context_t* ctx)
             load_cr3((uint32_t)np->page_dir);
     }
 
-    /* 8. Actualizar TSS.ESP0 con el kernel stack del nuevo thread.
-     *    Si el nuevo thread es Ring 3, la CPU necesita este valor para
-     *    cambiar al stack del kernel al recibir una interrupcion o syscall.
-     *    Para threads Ring 0 no es estrictamente necesario, pero no hace dano. */
-    tss_set_kernel_stack(next->kernel_stack_top);
-
-    /* 9. Actualizar puntero al thread actual */
+    /* 8. Actualizar puntero al thread actual */
     proc_set_current_thread(next);
     sched_current = next;
 

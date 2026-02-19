@@ -11,7 +11,6 @@ extern VOID VgaWriteSequencer(UCHAR Index, UCHAR Value);
 extern VOID VgaWriteGraphicsController(UCHAR Index, UCHAR Value);
 extern VOID VgaWriteCrtc(UCHAR Index, UCHAR Value);
 extern VOID VgaClearScreen(UCHAR Color);
-extern VOID VgaHardwareReset(VOID);
 
 static inline void outb_vga(uint16_t port, uint8_t value)
 {
@@ -36,9 +35,7 @@ static const UCHAR seq_regs[] = {
     0x01,   /* [1] Clocking Mode: 8 dot/char, bit3=0(NO Shift4), bit4=0(NO Shift Load) */
     0x0F,   /* [2] Map Mask: all planes enabled */
     0x00,   /* [3] Character Map Select */
-    0x06,   /* [4] Memory Mode: bit1=extended mem, bit2=0 odd/even off, bit3=0 chain4 OFF
-             * IMPORTANTE: 0x06 = solo extended memory. chain4(bit3) DEBE estar 0
-             * para modo planar 16-color. Si chain4=1 produce lineas verticales. */
+    0x06,   /* [4] Memory Mode: chain4 off, odd/even off, extended mem */
 };
 
 /* CRTC registers [index] = value */
@@ -49,12 +46,10 @@ static const UCHAR crtc_regs[] = {
     0x82,   /* [3]  End Horizontal Blanking */
     0x54,   /* [4]  Start Horizontal Retrace */
     0x80,   /* [5]  End Horizontal Retrace */
-    0x0B,   /* [6]  Vertical Total: 0x0B correcto para 640x480x16 (modo 0x12) */
+    0x0D,   /* [6]  Vertical Total: 0x0D correcto para 480 lineas (0x0B causaba mirror) */
     0x3E,   /* [7]  Overflow */
     0x00,   /* [8]  Preset Row Scan */
-    0x00,   /* [9]  Max Scan Line: 0x00 = sin line doubling ni scan doubling
-             * CRITICO: 0x40 activaba bit6 (line doubling) que causa lineas
-             * verticales en modo 640x480x16. Debe ser 0x00. */
+    0x40,   /* [9]  Max Scan Line */
     0x00,   /* [10] Cursor Start */
     0x00,   /* [11] Cursor End */
     0x00,   /* [12] Start Address High */
@@ -102,45 +97,22 @@ static const UCHAR ac_regs[] = {
     0x00,   /* [20] Color Select */
 };
 
-/* Helpers para enmascarar/desenmascarar IRQ12 (mouse) en el PIC slave
- * durante la programacion de registros VGA sensibles al timing.
- * IRQ12 interrumpiendo entre dos outb del AC (flip-flop) corrompe el modo. */
-static inline void irq12_mask(void)
-{
-    /* PIC slave data port = 0xA1. Leer mascara actual, poner bit4 (IRQ12) */
-    uint8_t mask;
-    __asm__ volatile("inb $0xA1, %0" : "=a"(mask));
-    mask |= 0x10;  /* bit4 = IRQ12 */
-    __asm__ volatile("outb %0, $0xA1" :: "a"(mask));
-}
-static inline void irq12_unmask(void)
-{
-    uint8_t mask;
-    __asm__ volatile("inb $0xA1, %0" : "=a"(mask));
-    mask &= ~0x10;  /* limpiar bit4 = IRQ12 */
-    __asm__ volatile("outb %0, $0xA1" :: "a"(mask));
-}
-
 NTSTATUS VgaSetMode(UCHAR Mode)
 {
     int i;
 
     if (Mode == VGA_MODE_GRAPHICS_640x480x16)
     {
-        /* ENMASCARAR IRQ12 (mouse PS/2) en el PIC antes de tocar registros VGA.
-         * El handler de IRQ12 llama MouseRead() que hace inb(0x3DA) —
-         * ese inb resetea el flip-flop del Attribute Controller.
-         * Si IRQ12 llega entre el outb(AC_INDEX, i) y outb(AC_WRITE, val),
-         * el AC queda desfasado y el modo grafico se corrompe completamente.
-         * cli solo no es suficiente si el timer hace sti internamente. */
-        irq12_mask();
-
-        /* 0. COMPLETE HARDWARE RESET
-         *    Perform full VGA hardware reset to clear any inconsistent state
-         *    left by bootloader (Mode 13h or text mode). This ensures all
-         *    VGA registers (Sequencer, CRTC, Graphics Controller, Attribute
-         *    Controller) are in a known, clean state before mode programming. */
-        VgaHardwareReset();
+        /* 0. Reset sincrono del Sequencer antes de cualquier cambio.
+         *    GRUB puede dejar el Sequencer en un estado con Shift4/Shift Load
+         *    activos (Clocking Mode bits 4,3) que causan mirror horizontal.
+         *    El reset sincrono (0x01) + reset async (0x00) limpia el estado. */
+        outb_vga(VGA_SEQ_INDEX, 0x00);
+        outb_vga(VGA_SEQ_DATA,  0x01);   /* reset sincrono */
+        /* Pequeno delay de I/O */
+        outb_vga(0x80, 0); outb_vga(0x80, 0); outb_vga(0x80, 0);
+        outb_vga(VGA_SEQ_INDEX, 0x00);
+        outb_vga(VGA_SEQ_DATA,  0x03);   /* operacion normal */
 
         /* 1. Desbloquear CRTC registers 0-7 */
         outb_vga(VGA_CRTC_INDEX, 0x11);
@@ -149,16 +121,10 @@ NTSTATUS VgaSetMode(UCHAR Mode)
         /* 2. Miscellaneous Output Register */
         outb_vga(VGA_MISC_WRITE, 0xE3);
 
-        /* 3. Sequencer
-         * SECUENCIA CORRECTA: poner en reset (0x01) ANTES de programar
-         * los registros 1-4, luego liberar con 0x03 al final.
-         * Programar con el Sequencer activo deja el VGA en estado indefinido
-         * despues de una boot animation que modifico los registros. */
-        VgaWriteSequencer(0x00, 0x01);          /* Sync reset: detener Sequencer */
-        for (i = 1; i < 5; i++) {
-            VgaWriteSequencer((UCHAR)i, seq_regs[i]); /* Programar regs 1-4 */
+        /* 3. Sequencer */
+        for (i = 0; i < 5; i++) {
+            VgaWriteSequencer((UCHAR)i, seq_regs[i]);
         }
-        VgaWriteSequencer(0x00, 0x03);          /* Liberar reset: operacion normal */
 
         /* 4. CRTC */
         for (i = 0; i < 25; i++) {
@@ -188,9 +154,6 @@ NTSTATUS VgaSetMode(UCHAR Mode)
 
         /* 8. Paleta de colores estandar */
         VgaInitializePalette();
-
-        /* Desenmascarar IRQ12 ahora que el modo esta completamente configurado */
-        irq12_unmask();
 
         return STATUS_SUCCESS;
     }

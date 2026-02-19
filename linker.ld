@@ -27,4 +27,9 @@ SECTIONS
         *(COMMON)
         *(.bss)
     }
+
+    /* Simbolo que marca el fin del kernel image.
+     * memory.c puede usarlo para inicializar el heap justo
+     * despues del kernel, sin hardcodear una direccion fija. */
+    _kernel_end = .;
 }

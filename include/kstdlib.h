@@ -11,6 +11,7 @@
 #include "types.h"
 
 /* Memory management */
+void heap_init(void);   /* Llamar UNA vez antes del primer malloc() */
 void *malloc(size_t size);
 void free(void *ptr);
 void *memset(void *ptr, int value, size_t n);

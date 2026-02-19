@@ -29,6 +29,7 @@
 #define SYS_GET_TICK    0x05
 #define SYS_GET_MOUSE        0x06   /* DEPRECATED — solo Ring 0 */
 #define SYS_GET_MOUSE_STATE  0x07   /* Ring 3 seguro: copia por valor */
+#define SYS_GET_PIXEL        0x08   /* Leer pixel del shadow buffer (x, y) -> color 0-15 */
 
 /* Estado del mouse (misma estructura que el kernel) */
 typedef struct {
@@ -143,6 +144,24 @@ static inline uint32_t sys_get_mouse_state(SYS_MOUSE* out)
         "int $0x30"
         : "=a"(ret)
         : "a"(SYS_GET_MOUSE_STATE), "b"(out)
+        : "memory"
+    );
+    return ret;
+}
+
+/*
+ * sys_get_pixel — leer el color de un pixel desde el shadow buffer del kernel.
+ * Permite al GUI guardar el fondo REAL bajo el cursor antes de dibujarlo,
+ * para restaurarlo correctamente al mover el mouse.
+ * Retorna el color VGA (0-15) o SYSCALL_ERR si las coordenadas son invalidas.
+ */
+static inline uint32_t sys_get_pixel(int x, int y)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "int $0x30"
+        : "=a"(ret)
+        : "a"(SYS_GET_PIXEL), "b"(x), "c"(y)
         : "memory"
     );
     return ret;

@@ -6,9 +6,7 @@
 
 #include "vga.h"
 #include "vga_font.h"
-/* vga_mouse.h NO se incluye aqui: en Ring 3 las funciones del driver
- * (MouseDraw, MouseErase, MouseRead) no son accesibles. El estado del
- * mouse se obtiene via syscall SYS_GET_MOUSE_STATE. */
+#include "vga_mouse.h"
 
 /* Colores del tema */
 #define GUI_COLOR_DESKTOP      VGA_COLOR_CYAN

@@ -111,19 +111,7 @@ process_t* proc_create_kernel(const char* name,
                                void (*entry_point)(void));
 
 /*
- * Crear el proceso GUI en Ring 3 (v0.4+).
- *
- * Versión simplificada de proc_create_user: toma directamente un
- * entry_point del kernel, crea un page directory con el kernel mapeado
- * como PTE_USER, y construye el frame de IRET para Ring 3.
- *
- * Úsala en lugar de proc_create_kernel para el gui_server.
- */
-process_t* proc_create_user_gui(const char* name,
-                                 void (*entry_point)(void));
-
-/*
- * Crear un proceso de usuario (Ring 3) genérico.
+ * Crear un proceso de usuario (Ring 3).
  * code_phys:  dirección física donde está el código del proceso.
  * code_size:  tamaño del código en bytes.
  * entry_virt: dirección virtual del punto de entrada (dentro del proceso).

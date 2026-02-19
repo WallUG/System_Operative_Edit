@@ -7,12 +7,42 @@
 
 #include <types.h>
 
-/* Simple heap implementation */
-#define HEAP_START 0x00100000  /* 1MB */
-#define HEAP_SIZE  0x00F00000  /* 15MB */
+/*
+ * HEAP_START debe estar DESPUES del fin del kernel image.
+ * El kernel se carga en 0x00100000 (linker.ld). Sus secciones ocupan:
+ *   .text   ~28KB  (EIPs del kernel llegan hasta ~0x107000)
+ *   .rodata ~4KB
+ *   .data   ~4KB
+ *   .bss    ~310KB (incluye g_shadow[640*480] = 300KB)
+ * Total kernel ~ 0x56000 bytes -> termina alrededor de 0x156000
+ *
+ * ANTES era 0x00100000 = MISMA DIRECCION que el inicio del kernel.
+ * El primer malloc() sobreescribia la cabecera multiboot y el .text
+ * del kernel con ceros -> comportamiento completamente indefinido.
+ *
+ * 0x00200000 (2MB) es seguro: deja >600KB de margen sobre el kernel
+ * y coincide con el comentario de pmm.h ("0x200000-... frames libres").
+ */
+#define HEAP_SIZE  0x00600000  /* 6MB de heap del kernel */
 
-static uint32_t heap_current = HEAP_START;
-static uint32_t heap_end = HEAP_START + HEAP_SIZE;
+/* _kernel_end es exportado por linker.ld como el primer byte libre
+ * despues de todas las secciones del kernel (.text/.rodata/.data/.bss).
+ * El heap empieza en el siguiente PAGE_ALIGN para que no haya overlap. */
+extern uint32_t _kernel_end;
+#define PAGE_ALIGN_UP(x) (((x) + 0xFFF) & ~0xFFFu)
+
+static uint32_t heap_current = 0;   /* inicializado en heap_init() */
+static uint32_t heap_end     = 0;
+
+/* Debe llamarse UNA vez al inicio, antes del primer malloc() */
+void heap_init(void)
+{
+    uint32_t start = PAGE_ALIGN_UP((uint32_t)&_kernel_end);
+    /* Nunca empieza antes de 0x200000 por seguridad (evita solapar con kernel) */
+    if (start < 0x00200000u) start = 0x00200000u;
+    heap_current = start;
+    heap_end     = start + HEAP_SIZE;
+}
 
 /**
  * malloc - Allocate memory
@@ -23,7 +53,11 @@ static uint32_t heap_end = HEAP_START + HEAP_SIZE;
 void *malloc(size_t size)
 {
     void *ptr;
-    
+
+    /* Si heap_init() no se llamo todavia, devolver NULL en lugar de
+     * escribir en la direccion 0 (o en el kernel image). */
+    if (heap_current == 0) return NULL;
+
     /* Align to 4 bytes */
     size = (size + 3) & ~3;
     

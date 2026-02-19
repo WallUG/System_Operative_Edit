@@ -6,9 +6,10 @@
 #include "mm/vmm.h"
 #include "proc/process.h"
 #include "proc/scheduler.h"
-#include "interrupt/tss.h"
-#include "interrupt/syscall.h"
+//#include "interrupt/tss.h"
+//#include "interrupt/syscall.h"
 #include "boot_splash.h"
+#include <kstdlib.h>
 
 /* Forward declarations */
 extern void gdt_init(void);
@@ -64,6 +65,14 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
      * el contexto del kernel, cualquier interrupcion durante la animacion
      * (timer, teclado) genera un page fault sin handler -> reset.
      */
+    /*
+     * HEAP PRIMERO — antes de cualquier llamada a malloc().
+     * heap_init() calcula el inicio del heap usando el simbolo _kernel_end
+     * del linker script, garantizando que el heap nunca solape con el
+     * kernel image (antes HEAP_START == 0x100000 == inicio del kernel).
+     */
+    heap_init();
+
     gdt_init();
     idt_init();
 
@@ -74,9 +83,15 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
      * La boot animation usa puertos I/O directos, no INT 0x10.
      */
     KernelShowBootSplash();
+	
+	/* Pausa pre-VGA con interrupciones deshabilitadas */
+    for (volatile int _delay = 0; _delay < 0xC000000; _delay++)
+        __asm__ volatile("nop");
 
-    /* Enable interrupts after IDT is set */
-    __asm__ volatile("sti");
+    /* NOTA: interrupciones se habilitan DESPUES del scheduler_init(),
+     * no aqui. El texto de boot corre con CLI para evitar IRQ espurias
+     * durante la inicializacion. */
+    /* __asm__ volatile("sti"); <- movido al final */
 
     /* Clear screen and setup colors */
     screen_clear();
@@ -116,32 +131,7 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Sistema de I/O inicializado");
 
-    /* IRQ12 se enmascara en el PIC directamente dentro de VgaSetMode()
-     * para proteger los registros VGA sensibles al timing (AC flip-flop).
-     * No se usa cli/sti aqui para no bloquear el timer del scheduler. */
-    if (!NT_SUCCESS(IoCreateDriver(&driverName, VgaDriverEntry))) {
-        kernel_panic("Failed to load VGA driver");
-    }
-    screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    screen_writeln("[OK] Driver VGA 640x480x16 cargado");
-
-    /* Barrita de progreso en texto */
-    screen_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
-    screen_write("    Iniciando modo grafico  [");
-    screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    screen_write("####################");
-    screen_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
-    screen_writeln("] 100%");
-    screen_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-    screen_writeln("");
-    screen_writeln("    Cargando interfaz grafica...");
-
-    /* Pequena espera activa SIN delay — solo un loop de I/O inocuo
-     * para que el texto sea visible (el CPU lo ejecuta en microsegundos
-     * pero nos da al menos un frame en QEMU) */
-    for (volatile int _i = 0; _i < 0x4FFFF; _i++) {
-        __asm__ volatile("nop");
-    }
+    
 
     /* ── v0.2: Subsistemas de memoria ──
      * Deben iniciarse ANTES del driver VGA para que el PMM no
@@ -167,7 +157,7 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     /* TSS: necesario para Ring 3 → Ring 0 en syscalls e interrupciones.
      * Debe inicializarse DESPUES de gdt_init() y vmm_init().
      * gdt_install_tss() extiende la GDT con el descriptor del TSS en entrada 5. */
-    tss_init();
+    //tss_init();
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] TSS inicializado (selector 0x28)");
 
@@ -180,42 +170,40 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
         kernel_panic("Failed to initialize display");
     }
 
-    /* Inicializar mouse ANTES de crear el proceso GUI */
     MouseInit();
 
-    /* Crear el proceso GUI como proceso de kernel (Ring 0 por ahora).
-     * GuiMainLoop() sera el entry point del thread GUI.
-     * El scheduler lo ejecutara de forma cooperativa con el idle. */
-    /* Syscalls: registrar INT 0x30 en la IDT con DPL=3
-     * Debe hacerse DESPUES de idt_init() porque usa idt_set_gate_pub(). */
-    syscall_init();
+    
+    screen_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
+    screen_writeln("");
+    screen_write("    Iniciando modo grafico  [");
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    screen_writeln("[OK] Syscalls INT 0x30 registradas (DPL=3)");
+    screen_write("####################");
+    screen_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
+    screen_writeln("] 100%");
+    screen_set_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    screen_writeln("");
+    screen_writeln("    Cargando interfaz grafica...");
+    screen_writeln("    (La pantalla cambiara a modo grafico en un momento)");
 
-    /*
-     * v0.4: Crear el proceso GUI en Ring 3 real.
-     * proc_create_user_gui() mapea el kernel con PTE_USER, crea un page
-     * directory propio y construye el frame de IRET con CS=0x1B (Ring 3).
-     * El GUI corre con CPL=3 y solo puede llamar al kernel via INT 0x30.
-     */
-    proc_create_user_gui("gui_server", GuiMainLoop);
-    screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    screen_writeln("[OK] Proceso gui_server creado en Ring 3 (PID 1)");
-    screen_writeln("     -> CS=0x1B SS=0x23 CPL=3 / syscalls INT 0x30");
+    /* Pausa para que el usuario pueda leer el mensaje */
+    for (volatile int _delay = 0; _delay < 0xC000000; _delay++)
+        __asm__ volatile("nop");
 
+    /* Ahora si: inicializar el driver VGA (cambia a modo grafico 0x12) */
+    if (!NT_SUCCESS(IoCreateDriver(&driverName, VgaDriverEntry))) {
+        kernel_panic("Failed to load VGA driver");
+    }
+    /* NOTA: screen_writeln() ya no funciona aqui (modo grafico activo) */
+
+    /* gui_server como kernel thread Ring 0 */
+	proc_create_kernel("gui_server", GuiMainLoop);
+	
     /* Inicializar el scheduler.
      * proc_create_kernel() ya llamo scheduler_add_thread() internamente
      * para el thread del gui_server. El idle lo anade scheduler_init(). */
     scheduler_init();
 
-    screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    screen_writeln("[OK] Scheduler v0.2 activo — Round-Robin");
-    screen_writeln("");
-    screen_set_color(VGA_COLOR_YELLOW, VGA_COLOR_BLACK);
-    screen_writeln("    Transfiriendo control al scheduler...");
-
-    /* Pausa para que el texto sea visible */
-    for (volatile int _i = 0; _i < 0x2FFFF; _i++) __asm__ volatile("nop");
+    /* NOTA: No llamar screen_writeln aqui - VGA ya esta en modo grafico */
 
     /*
      * Idle loop.
