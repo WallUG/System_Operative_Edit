@@ -104,14 +104,15 @@ static const unsigned char font8x8[96][8] = {
     {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}, /* 127 DEL (bloque solido) */
 };
 
-VOID VgaDrawChar(INT x, INT y, char c, UCHAR fg, UCHAR bg)
+VOID VgaDrawChar(int32_t x, int32_t y, char c, UCHAR fg, UCHAR bg)
 {
     int row, col;
     const unsigned char* glyph;
 
-    /* Solo ASCII imprimible */
-    if (c < 32 || c > 127) c = '?';
-    glyph = font8x8[(unsigned char)c - 32];
+    /* Solo ASCII imprimible, cast a unsigned char para evitar warning */
+    unsigned char uc = (unsigned char)c;
+    if (uc < 32 || uc > 127) uc = '?';
+    glyph = font8x8[uc - 32];
 
     for (row = 0; row < FONT_HEIGHT; row++) {
         unsigned char bits = glyph[row];
@@ -128,9 +129,9 @@ VOID VgaDrawChar(INT x, INT y, char c, UCHAR fg, UCHAR bg)
     }
 }
 
-VOID VgaDrawString(INT x, INT y, const char* str, UCHAR fg, UCHAR bg)
+VOID VgaDrawString(int32_t x, int32_t y, const char* str, UCHAR fg, UCHAR bg)
 {
-    INT cx = x;
+    int32_t cx = x;
     if (!str) return;
     while (*str) {
         if (*str == '\n') {

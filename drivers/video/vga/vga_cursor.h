@@ -8,7 +8,7 @@
 #ifndef _VGA_CURSOR_H
 #define _VGA_CURSOR_H
 
-#include <types.h>   /* INT, UCHAR */
+#include <types.h>   /* int32_t, uint8_t, etc. */
 
 #define CURSOR_WIDTH  8
 #define CURSOR_HEIGHT 12
@@ -19,9 +19,9 @@
 void CursorInit(void);
 
 /* Dibujar cursor en la posición indicada. Guarda el contenido previo. */
-void CursorDraw(INT x, INT y);
+void CursorDraw(int32_t x, int32_t y);
 
 /* Borrar cursor previamente dibujado en la posición especificada. */
-void CursorErase(INT x, INT y);
+void CursorErase(int32_t x, int32_t y);
 
 #endif /* _VGA_CURSOR_H */

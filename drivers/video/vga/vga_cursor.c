@@ -3,8 +3,8 @@
 
 /* Fondo del cursor, ancho*alto bytes */
 static UCHAR g_cursor_bg[CURSOR_WIDTH * CURSOR_HEIGHT];
-static INT   g_cursor_saved_x = -1;
-static INT   g_cursor_saved_y = -1;
+static int32_t g_cursor_saved_x = -1;
+static int32_t g_cursor_saved_y = -1;
 
 /* Bitmap estático de la flecha (1=blanco, 2=negro, 0=transparente) */
 static const unsigned char cursor_bitmap[CURSOR_HEIGHT][CURSOR_WIDTH] = {
@@ -28,7 +28,7 @@ void CursorInit(void) {
     g_cursor_saved_y = -1;
 }
 
-void CursorDraw(INT x, INT y) {
+void CursorDraw(int32_t x, int32_t y) {
     int row, col;
     /* guardar fondo real */
     for (row = 0; row < CURSOR_HEIGHT; row++) {
@@ -50,7 +50,7 @@ void CursorDraw(INT x, INT y) {
     }
 }
 
-void CursorErase(INT x, INT y) {
+void CursorErase(int32_t x, int32_t y) {
     int row, col;
     if (x < 0 || y < 0) return;
     for (row = 0; row < CURSOR_HEIGHT; row++) {
