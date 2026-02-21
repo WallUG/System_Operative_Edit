@@ -8,16 +8,16 @@
 #ifndef _PS2MOUSE_H
 #define _PS2MOUSE_H
 
-#include <types.h>   /* INT, UCHAR, etc. */
+#include <types.h>   /* proporciona int32_t, uint8_t, etc. */
 
 #define MOUSE_WIDTH  8
 #define MOUSE_HEIGHT 12
 
 /* Estado del mouse compartido con el resto del sistema */
 typedef struct _MOUSE_STATE {
-    INT  x, y;          /* Posicion actual */
-    INT  buttons;       /* Bits: 0=izq, 1=der, 2=medio */
-    INT  visible;       /* Cursor visible */
+    int32_t x, y;       /* Posicion actual */
+    int32_t buttons;    /* Bits: 0=izq, 1=der, 2=medio */
+    int32_t visible;    /* Cursor visible */
 } MOUSE_STATE;
 
 /* Inicializar el controlador PS/2 y habilitar IRQ de mouse */
