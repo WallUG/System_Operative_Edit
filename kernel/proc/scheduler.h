@@ -34,8 +34,11 @@
 #include <types.h>
 #include "proc/process.h"
 
-/* Número de ticks de timer por quantum (5 ticks ≈ 275ms a 18.2Hz) */
-#define SCHEDULER_QUANTUM   5
+/* Número de ticks de timer por quantum.
+ * A partir de ahora reprogramamos el PIT a 100Hz en hal_init(),
+ * por lo que 10 ticks ≈ 100ms. Ajustar según sea necesario para
+ * lograr el balance entre responsividad y overhead de switches. */
+#define SCHEDULER_QUANTUM   10
 
 /* Inicializar el scheduler — debe llamarse DESPUÉS de proc_init() */
 void scheduler_init(void);

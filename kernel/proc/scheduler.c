@@ -9,7 +9,7 @@
  *   │    ↑_________________________________↑   │
  *   └──────────────────────────────────────────┘
  *
- * En cada tick del timer (IRQ0):
+ * En cada tick del timer (IRQ0) (ahora configurado a 100 Hz):
  *   1. Decrementar quantum del thread actual
  *   2. Si quantum > 0: retornar el mismo contexto (sin cambio)
  *   3. Si quantum = 0: salvar contexto actual, avanzar al siguiente READY,
@@ -32,8 +32,11 @@
 
 /* ── Estado del scheduler ─────────────────────────────────────────────── */
 
-/* Cola circular de threads listos para ejecutar */
+/* Cola circular de threads listos para ejecutar. Se mantiene también un
+ * puntero "tail" para inserciones O(1) y, más adelante, podríamos convertirla
+ * en lista doble para remociones rápidas. */
 static thread_t*  sched_queue_head = NULL;   /* cabeza de la cola */
+static thread_t*  sched_queue_tail = NULL;   /* último elemento (apunta a head) */
 static thread_t*  sched_current    = NULL;   /* thread ejecutándose ahora */
 static uint32_t   sched_switches   = 0;      /* contador de context switches */
 
@@ -47,23 +50,17 @@ static void queue_insert(thread_t* t)
 {
     if (!t) return;
 
-    t->next = NULL;
-
     if (!sched_queue_head) {
         /* Cola vacía: el thread apunta a sí mismo */
         sched_queue_head = t;
+        sched_queue_tail = t;
         t->next = t;
-        return;
+    } else {
+        /* Inserción al final aprovechando "tail" para O(1" ) */
+        t->next = sched_queue_head;
+        sched_queue_tail->next = t;
+        sched_queue_tail = t;
     }
-
-    /* Encontrar el último nodo (el que apunta de vuelta a head) */
-    thread_t* cur = sched_queue_head;
-    while (cur->next != sched_queue_head) {
-        cur = cur->next;
-    }
-    /* cur es el último. Insertar t después de cur */
-    cur->next = t;
-    t->next   = sched_queue_head;
 }
 
 /*
@@ -78,11 +75,12 @@ static void queue_remove(thread_t* t)
     if (sched_queue_head->next == sched_queue_head &&
         sched_queue_head == t) {
         sched_queue_head = NULL;
+        sched_queue_tail = NULL;
         t->next = NULL;
         return;
     }
 
-    /* Encontrar el nodo anterior a t */
+    /* Buscar nodo anterior a t (necesario con lista simple) */
     thread_t* prev = sched_queue_head;
     while (prev->next != t && prev->next != sched_queue_head) {
         prev = prev->next;
@@ -94,6 +92,10 @@ static void queue_remove(thread_t* t)
 
     if (sched_queue_head == t) {
         sched_queue_head = t->next;
+    }
+    if (sched_queue_tail == t) {
+        /* tail debe moverse al anterior que acabamos de encontrar */
+        sched_queue_tail = prev;
     }
 
     t->next = NULL;
