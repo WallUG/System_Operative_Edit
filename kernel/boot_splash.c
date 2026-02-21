@@ -591,8 +591,11 @@ static void draw_char(int sx, int sy, char c,
     glyph = FONT8X8[(unsigned char)(c - 32)];
     for (row = 0; row < 8; row++) {
         unsigned char bits = glyph[row];
+        /* los datos de FONT8X8 estan en orden LSB->MSB (bit0 = columna izquierda)
+           por lo que comprobamos "bits & (1 << col)" en lugar de desplazar
+           el maska de MSB. De lo contrario cada caracter se dibuja espejado. */
         for (col = 0; col < 8; col++) {
-            if (bits & (0x80u >> col)) {
+            if (bits & (1u << col)) {
                 for (by = 0; by < scale; by++)
                     for (bx = 0; bx < scale; bx++)
                         px(sx + col*scale + bx, sy + row*scale + by, color);
@@ -777,7 +780,10 @@ void KernelShowBootSplash(void)
     draw_progress(5, 5, "Sistema listo!");
     delay_ms(380);
 
-    /* 9. Restaurar modo texto 80x25 por puertos (sin BIOS) */
+    /* 9. Mantener pantalla estática unos 20 segundos para visibilidad */
+    delay_ms(20000);
+
+    /* 10. Restaurar modo texto 80x25 por puertos (sin BIOS) */
     set_mode3();
     delay_ms(30);
 }

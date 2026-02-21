@@ -116,8 +116,10 @@ VOID VgaDrawChar(INT x, INT y, char c, UCHAR fg, UCHAR bg)
     for (row = 0; row < FONT_HEIGHT; row++) {
         unsigned char bits = glyph[row];
         for (col = 0; col < FONT_WIDTH; col++) {
-            /* Bit mas significativo = columna izquierda */
-            if (bits & (0x80 >> col)) {
+            /* Los datos de la fuente vienen con el bit menos significativo
+               en la columna izquierda. Anteriormente usábamos el bit más
+               significativo y eso invertía cada caracter. */
+            if (bits & (1 << col)) {
                 VgaPutPixel(x + col, y + row, fg);
             } else {
                 VgaPutPixel(x + col, y + row, bg);
