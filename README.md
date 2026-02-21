@@ -180,7 +180,7 @@ Ver documentación completa en [boot/freeldr/BOOT_ANIMATION.md](boot/freeldr/BOO
 
 ### Driver Framework - Fase 2
 - [ ] Implementar driver de teclado PS/2
-- [ ] Implementar driver de mouse PS/2
+- [ ] Implementar driver de mouse PS/2 (ahora separado en drivers/input)
 - [ ] Agregar más modos de video VGA
 - [ ] Implementar framebuffer manager
 - [ ] Agregar soporte para texto en modo gráfico

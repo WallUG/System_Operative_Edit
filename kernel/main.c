@@ -11,6 +11,9 @@
 #include "boot_splash.h"
 #include <kstdlib.h>
 
+/* entrada de mouse PS/2 (antes en vga_mouse.h) */
+#include "../drivers/input/ps2mouse.h"
+
 /* Forward declarations */
 extern void gdt_init(void);
 extern void idt_init(void);
@@ -35,7 +38,7 @@ extern NTSTATUS VgaDriverEntry(void*, PUNICODE_STRING);
 extern NTSTATUS HalInitializeDisplay(void);
 extern void VgaDrawDemo(void);
 extern void GuiMainLoop(void);
-extern void MouseInit(void);
+/* extern void MouseInit(void);  moved to ps2mouse.h */
 
 void kernel_panic(const char* message)
 {

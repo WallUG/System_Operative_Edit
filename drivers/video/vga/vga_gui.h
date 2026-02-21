@@ -6,7 +6,8 @@
 
 #include "vga.h"
 #include "vga_font.h"
-#include "vga_mouse.h"
+#include <input/ps2mouse.h>
+#include "vga_cursor.h"
 
 /* Colores del tema */
 #define GUI_COLOR_DESKTOP      VGA_COLOR_CYAN

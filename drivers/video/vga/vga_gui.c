@@ -3,6 +3,8 @@
  */
 #include "vga_gui.h"
 
+/* nota: el driver de entrada (ps2mouse) define MouseInit/MouseRead/MouseGetState */
+
 VOID GuiDrawDesktop(VOID)
 {
     /* Fondo del escritorio */
@@ -135,7 +137,7 @@ VOID GuiMainLoop(VOID)
     GuiDrawButton(welcome.x + 130, welcome.y + 90, 60, 14, "Aceptar", 0);
 
     /* Cursor inicial en 320,240 — prev_x/prev_y ya inicializados al mismo valor */
-    MouseDraw(320, 240);
+    CursorDraw(320, 240);
 
     /* Loop principal de la GUI.
      * Estrategia de control de recursos:
@@ -155,8 +157,8 @@ VOID GuiMainLoop(VOID)
 
         /* Redibujar cursor solo si se movio (evita flickering y escrituras VGA) */
         if (ms->x != prev_x || ms->y != prev_y) {
-            MouseErase(prev_x, prev_y);
-            MouseDraw(ms->x, ms->y);
+            CursorErase(prev_x, prev_y);
+            CursorDraw(ms->x, ms->y);
             prev_x = ms->x;
             prev_y = ms->y;
         }
