@@ -32,7 +32,7 @@
 #define _SCHEDULER_H
 
 #include <types.h>
-#include "proc/process.h"
+#include "process.h"    /* está en el mismo directorio */
 
 /* Número de ticks de timer por quantum.
  * A partir de ahora reprogramamos el PIT a 100Hz en hal_init(),

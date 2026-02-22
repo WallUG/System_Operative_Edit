@@ -20,8 +20,10 @@ add_library(kernel OBJECT
     ../drivers/video/vga/vga_operations.c
     ../drivers/video/vga/vga_font.c
     ../drivers/video/vga/vga_cursor.c
-    ../drivers/video/vga/vga_gui.c
     ../drivers/input/ps2mouse.c
+    interrupt/syscall.c
+    interrupt/tss.c
+    ../user/gui_user.c
     ../lib/memory.c
 )
 

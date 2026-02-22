@@ -32,4 +32,19 @@ SECTIONS
      * memory.c puede usarlo para inicializar el heap justo
      * despues del kernel, sin hardcodear una direccion fija. */
     _kernel_end = .;
+
+    /* Sección para código de usuario (procesos Ring 3) */
+    .user ALIGN(4K) : {
+        _user_start = .;
+        *(.user)
+    }
+    /* Zona de datos de usuario (lectura/escritura) */
+    .user.data ALIGN(4K) : {
+        *(.user.data)
+    }
+    /* Datos de usuario constantes */
+    .user.rodata ALIGN(4K) : {
+        *(.user.rodata)
+        _user_end = .;
+    }
 }

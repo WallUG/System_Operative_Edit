@@ -11,7 +11,8 @@ echo "=== Running in QEMU ==="
 qemu-system-i386 \
     -kernel "$KERNEL" \
     -m 128M \
-    -serial stdio \
-    -display gtk
+    -serial file:serial.log \
+    -display gtk \
+    -no-reboot
 
-# For debugging add: -s -S
+# Para depuración también se puede añadir: -s -S

@@ -30,6 +30,8 @@
 #define SYS_GET_MOUSE        0x06   /* DEPRECATED — solo Ring 0 */
 #define SYS_GET_MOUSE_STATE  0x07   /* Ring 3 seguro: copia por valor */
 #define SYS_GET_PIXEL        0x08   /* Leer pixel del shadow buffer (x, y) -> color 0-15 */
+#define SYS_DEBUG            0x09   /* imprime cadena en serial */
+#define SYS_DUMP_VRAM        0x0A   /* debug: print portion of VGA memory */
 
 /* Estado del mouse (misma estructura que el kernel) */
 typedef struct {
@@ -40,81 +42,113 @@ typedef struct {
 
 /* ── Macros inline para cada syscall ─────────────────────────────────── */
 
-static inline uint32_t sys_exit(uint32_t code)
+static inline __attribute__((always_inline)) uint32_t sys_exit(uint32_t code)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_EXIT), "b"(code)
+        : [num]"i"(SYS_EXIT), "b"(code)
         : "memory"
     );
     return ret;
 }
 
-static inline uint32_t sys_yield(void)
+static inline __attribute__((always_inline)) uint32_t sys_yield(void)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_YIELD)
+        : [num]"i"(SYS_YIELD)
         : "memory"
     );
     return ret;
 }
 
-static inline uint32_t sys_draw_pixel(int x, int y, uint8_t color)
+static inline __attribute__((always_inline)) uint32_t sys_draw_pixel(int x, int y, uint8_t color)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_DRAW_PIXEL), "b"(x), "c"(y), "d"(color)
+        : [num]"i"(SYS_DRAW_PIXEL), "b"(x), "c"(y), "d"(color)
         : "memory"
     );
     return ret;
 }
 
-static inline uint32_t sys_fill_rect(int x, int y, int w, int h, uint8_t color)
+static inline __attribute__((always_inline)) uint32_t sys_fill_rect(int x, int y, int w, int h, uint8_t color)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_FILL_RECT), "b"(x), "c"(y), "d"(w), "S"(h), "D"(color)
+        : [num]"i"(SYS_FILL_RECT), "b"(x), "c"(y), "d"(w), "S"(h), "D"(color)
         : "memory"
     );
     return ret;
 }
 
-static inline uint32_t sys_draw_string(int x, int y, const char* s,
+static inline __attribute__((always_inline)) uint32_t sys_draw_string(int x, int y, const char* s,
                                         uint8_t fg, uint8_t bg)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_DRAW_STRING), "b"(x), "c"(y), "d"(s), "S"(fg), "D"(bg)
+        : [num]"i"(SYS_DRAW_STRING), "b"(x), "c"(y), "d"(s), "S"(fg), "D"(bg)
         : "memory"
     );
     return ret;
 }
 
-static inline uint32_t sys_get_tick(void)
+static inline __attribute__((always_inline)) uint32_t sys_get_tick(void)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_GET_TICK)
+        : [num]"i"(SYS_GET_TICK)
+        : "memory"
+    );
+    return ret;
+}
+
+static inline __attribute__((always_inline)) uint32_t sys_dump_vram(void)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_DUMP_VRAM)
+        : "memory"
+    );
+    return ret;
+}
+
+static inline __attribute__((always_inline)) uint32_t sys_debug(const char* msg)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_DEBUG), "b"(msg)
         : "memory"
     );
     return ret;
 }
 
 /* DEPRECATED: devuelve puntero al kernel — seguro solo en Ring 0 */
-static inline SYS_MOUSE* sys_get_mouse(void)
+static inline __attribute__((always_inline)) SYS_MOUSE* sys_get_mouse(void)
 {
     uint32_t ret;
     __asm__ volatile(
@@ -141,9 +175,10 @@ static inline uint32_t sys_get_mouse_state(SYS_MOUSE* out)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_GET_MOUSE_STATE), "b"(out)
+        : [num]"i"(SYS_GET_MOUSE_STATE), "b"(out)
         : "memory"
     );
     return ret;
@@ -155,13 +190,14 @@ static inline uint32_t sys_get_mouse_state(SYS_MOUSE* out)
  * para restaurarlo correctamente al mover el mouse.
  * Retorna el color VGA (0-15) o SYSCALL_ERR si las coordenadas son invalidas.
  */
-static inline uint32_t sys_get_pixel(int x, int y)
+static inline __attribute__((always_inline)) uint32_t sys_get_pixel(int x, int y)
 {
     uint32_t ret;
     __asm__ volatile(
+        "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : "a"(SYS_GET_PIXEL), "b"(x), "c"(y)
+        : [num]"i"(SYS_GET_PIXEL), "b"(x), "c"(y)
         : "memory"
     );
     return ret;

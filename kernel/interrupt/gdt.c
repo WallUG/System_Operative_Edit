@@ -21,8 +21,10 @@ struct gdt_ptr {
     uint32_t base;
 } __attribute__((packed));
 
-/* GDT with 5 entries: null, code, data, user code, user data */
-static struct gdt_entry gdt[5];
+#include "gdt.h"
+
+/* GDT with 6 entries: null, code0, data0, code3, data3, TSS */
+static struct gdt_entry gdt[6];
 static struct gdt_ptr gdtp;
 
 /* Set GDT gate */
@@ -38,11 +40,23 @@ static void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access,
     gdt[num].access = access;
 }
 
+/* Instalación de descriptor TSS en la entrada 5 de la GDT.
+ * El descriptor debe tener tipo "available 32-bit TSS" (0x9) y DPL=0.
+ */
+void gdt_install_tss(uint32_t base, uint32_t limit)
+{
+    /* access: present(1) | DPL=0 | S=0 | type=9 */
+    uint8_t access = 0x89;
+    /* granularity: byte granularity, 32‑bit (0x40) */
+    uint8_t gran = 0x40;
+    gdt_set_gate(5, base, limit, access, gran);
+}
+
 /* Initialize GDT */
 void gdt_init(void)
 {
     /* Setup GDT pointer */
-    gdtp.limit = (sizeof(struct gdt_entry) * 5) - 1;
+    gdtp.limit = (sizeof(struct gdt_entry) * 6) - 1;
     gdtp.base = (uint32_t)&gdt;
     
     /* NULL descriptor */
@@ -59,6 +73,9 @@ void gdt_init(void)
     
     /* Data segment (ring 3) */
     gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
+    
+    /* TSS descriptor placeholder - rellenado por tss_init() */
+    gdt_set_gate(5, 0, 0, 0, 0);
     
     /* Load GDT */
     __asm__ volatile("lgdt %0" : : "m"(gdtp));

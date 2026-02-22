@@ -61,10 +61,35 @@ PDEVICE_OBJECT VgaGetDeviceObject(VOID)
  */
 VOID VgaPutPixel(INT x, INT y, UCHAR Color)
 {
+    /* debug: log more draws so we can see coverage on bad lines */
+    static int dbg_count = 0;
+    if (dbg_count < 2000) {
+        extern void serial_puts(const char*);
+        char buf[64];
+        int n = 0;
+        buf[n++]='v'; buf[n++]='p'; buf[n++]='i'; buf[n++]='x'; buf[n++]='e'; buf[n++]='l'; buf[n++]=' ';
+        int tx = x;
+        if (tx < 0) { buf[n++]='-'; tx = -tx; }
+        char tmp[12]; int ti=0;
+        do { tmp[ti++] = '0' + (tx % 10); tx /= 10; } while (tx);
+        while (ti) buf[n++] = tmp[--ti];
+        buf[n++]=',';
+        int ty = y;
+        if (ty < 0) { buf[n++]='-'; ty = -ty; }
+        ti = 0; do { tmp[ti++] = '0' + (ty % 10); ty /= 10; } while (ty);
+        while (ti) buf[n++] = tmp[--ti];
+        buf[n++]=' ';
+        buf[n++]='c'; buf[n++]='o'; buf[n++]='l'; buf[n++]='=';
+        int tc = Color;
+        ti = 0; do { tmp[ti++] = '0' + (tc % 10); tc /= 10; } while (tc);
+        while (ti) buf[n++] = tmp[--ti];
+        buf[n++]='\r'; buf[n++]='\n'; buf[n]=0;
+        serial_puts(buf);
+        dbg_count++;
+    }
+
     PVGA_DEVICE_EXTENSION DevExt;
     PUCHAR FrameBuffer;
-    ULONG Offset;
-    UCHAR BitMask;
 
     if (!g_VgaDevice) return;
     DevExt = (PVGA_DEVICE_EXTENSION)g_VgaDevice->DeviceExtension;
@@ -73,42 +98,45 @@ VOID VgaPutPixel(INT x, INT y, UCHAR Color)
     if (y < 0 || y >= (INT)DevExt->ScreenHeight) return;
 
     FrameBuffer = (PUCHAR)DevExt->FrameBuffer;
-    Offset  = (ULONG)y * (DevExt->ScreenWidth / 8) + (ULONG)(x / 8);
-    BitMask = 0x80 >> (x & 7);   /* bit7 = pixel izquierdo del byte */
 
-    /*
-     * Metodo Set/Reset: la forma canonica de escribir un pixel en VGA planar.
-     * El GC aplica el color a todos los planos automaticamente, sin necesidad
-     * de iterar plano por plano ni preocuparse por el latch.
-     *
-     * GC[0] Set/Reset    = Color (el color a escribir)
-     * GC[1] Enable S/R   = 0x0F  (activar S/R en los 4 planos)
-     * GC[8] Bit Mask     = BitMask (solo el bit del pixel a cambiar)
-     * Sequencer[2]       = 0x0F (habilitar escritura en 4 planos)
-     *
-     * La lectura del latch (dummy read) carga el byte actual del framebuffer
-     * en los latches de los 4 planos. Luego la escritura aplica:
-     *   - En los bits indicados por BitMask: usa el valor de Set/Reset
-     *   - En los demas bits: mantiene el valor del latch (otros pixels)
-     * Resultado: solo el pixel en (x,y) cambia, los 7 vecinos no se tocan.
-     */
-    VgaWriteGraphicsController(0, Color);    /* Set/Reset value */
-    VgaWriteGraphicsController(1, 0x0F);     /* Enable Set/Reset todos planos */
-    VgaWriteGraphicsController(8, BitMask);  /* Bit mask: solo nuestro pixel */
-    VgaWriteSequencer(2, 0x0F);              /* Escribir en los 4 planos */
+    /* compute byte index for (x,y) */
+    ULONG byte = (ULONG)y * (DevExt->ScreenWidth / 8) + (ULONG)(x / 8);
+    UCHAR bitmask = 0x80 >> (x & 7);
 
-    /* Latch read: carga los 4 planos en los latches internos */
-    volatile UCHAR dummy = FrameBuffer[Offset]; (void)dummy;
-
-    /* Escritura: aplica Set/Reset con BitMask -> escribe el pixel */
-    FrameBuffer[Offset] = 0xFF;   /* El valor no importa, S/R lo sobreescribe */
-
-    /* Restaurar GC a estado normal */
-    VgaWriteGraphicsController(1, 0x00);     /* Disable Set/Reset */
-    VgaWriteGraphicsController(8, 0xFF);     /* Bit mask = todos */
-
-    /* Actualizar shadow framebuffer */
+    /* update shadow with new color */
     g_shadow[y * SHADOW_W + x] = Color;
+
+    /* for each plane, rebuild the byte from shadow and write with mask */
+    for (int p = 0; p < 4; p++) {
+        UCHAR planeValue = 0;
+        int baseX = (x / 8) * 8;
+        for (int b = 0; b < 8; b++) {
+            int px = baseX + b;
+            if (px < 0 || px >= SHADOW_W) continue;
+            UCHAR col = g_shadow[y * SHADOW_W + px];
+            if (col & (1 << p))
+                planeValue |= (0x80 >> b);
+        }
+        /* debug: log planeValue for the first few columns of each row */
+        if (x < 10 && dbg_count < 10000) {
+            extern void serial_puts(const char*);
+            char buf[40]; int n=0;
+            buf[n++] = 'p'; buf[n++] = 'l'; buf[n++] = 'a'; buf[n++] = 'n'; buf[n++] = 'e';
+            buf[n++] = '0' + p; buf[n++] = '=';
+            const char *hex="0123456789ABCDEF";
+            buf[n++] = hex[(planeValue>>4)&0xF];
+            buf[n++] = hex[planeValue&0xF];
+            buf[n++]='\n'; buf[n]=0;
+            serial_puts(buf);
+        }
+
+        /* select plane via sequencer mask */
+        VgaWriteSequencer(2, 1 << p);
+        FrameBuffer[byte] = planeValue;
+    }
+
+    /* restore mask so future writes hit all planes */
+    VgaWriteSequencer(2, 0x0F);
 }
 
 /**
@@ -163,77 +191,15 @@ VOID VgaClearScreen(UCHAR Color)
  */
 VOID VgaFillRect(INT x, INT y, INT width, INT height, UCHAR Color)
 {
-    PVGA_DEVICE_EXTENSION DevExt;
-    PUCHAR fb;
-    INT row, cx;
-    INT x_end;
-    ULONG stride;
-
-    if (!g_VgaDevice) return;
-    DevExt = (PVGA_DEVICE_EXTENSION)g_VgaDevice->DeviceExtension;
-    if (!DevExt || !DevExt->GraphicsMode) return;
+    /* fall back to pixel-by-pixel writes using the same mechanism as
+       VgaPutPixel.  This sacrifices performance but guarantees correct
+       plane updates under emulators that ignore the graphics controller
+       map mask / write mode features. */
     if (width <= 0 || height <= 0) return;
 
-    fb     = (PUCHAR)DevExt->FrameBuffer;
-    stride = DevExt->ScreenWidth / 8;   /* bytes por fila por plano = 80 */
-    x_end  = x + width;
-
-    /* Configurar write mode 0: Set/Reset activo con el color */
-    VgaWriteGraphicsController(0, Color);  /* Set/Reset = color */
-    VgaWriteGraphicsController(1, 0x0F);   /* Enable Set/Reset en los 4 planos */
-    VgaWriteGraphicsController(3, 0x00);   /* Data Rotate = 0 */
-    VgaWriteGraphicsController(5, 0x00);   /* Write mode 0 */
-
-    for (row = 0; row < height; row++) {
-        INT py = y + row;
-        if (py < 0 || py >= (INT)DevExt->ScreenHeight) continue;
-
-        /* Habilitar escritura en todos los planos */
-        VgaWriteSequencer(2, 0x0F);
-
-        for (cx = x; cx < x_end; ) {
-            if (cx < 0) { cx++; continue; }
-            if (cx >= (INT)DevExt->ScreenWidth) break;
-
-            ULONG byte_off = (ULONG)py * stride + (ULONG)cx / 8;
-            INT   bit_pos  = cx % 8;
-
-            if (bit_pos == 0 && (cx + 8) <= x_end && (cx + 8) <= (INT)DevExt->ScreenWidth) {
-                /* Byte completo: 8 pixeles de una sola escritura */
-                VgaWriteGraphicsController(8, 0xFF);   /* todos los bits */
-                volatile UCHAR dummy = fb[byte_off]; (void)dummy;
-                fb[byte_off] = 0xFF;
-                cx += 8;
-            } else {
-                /* Byte parcial: construir mascara de bits */
-                INT  end_bit = 8;
-                if ((cx - bit_pos + 8) > x_end)   end_bit = x_end - (cx - bit_pos);
-                if ((cx - bit_pos + 8) > (INT)DevExt->ScreenWidth) end_bit = (INT)DevExt->ScreenWidth - (cx - bit_pos);
-                UCHAR mask = 0;
-                for (INT b = bit_pos; b < end_bit; b++) mask |= (0x80 >> b);
-                VgaWriteGraphicsController(8, mask);
-                volatile UCHAR dummy = fb[byte_off]; (void)dummy;
-                fb[byte_off] = 0xFF;
-                cx = (cx - bit_pos) + end_bit;
-            }
-        }
-    }
-
-    /* Restaurar estado normal */
-    VgaWriteGraphicsController(0, 0x00);
-    VgaWriteGraphicsController(1, 0x00);
-    VgaWriteGraphicsController(8, 0xFF);
-    VgaWriteSequencer(2, 0x0F);
-
-    /* Actualizar shadow framebuffer para el rectangulo completo */
-    {
-        INT sy, sx;
-        for (sy = y; sy < y + height; sy++) {
-            if (sy < 0 || sy >= SHADOW_H) continue;
-            for (sx = x; sx < x + width; sx++) {
-                if (sx < 0 || sx >= SHADOW_W) continue;
-                g_shadow[sy * SHADOW_W + sx] = Color;
-            }
+    for (INT row = 0; row < height; row++) {
+        for (INT col = 0; col < width; col++) {
+            VgaPutPixel(x + col, y + row, Color);
         }
     }
 }

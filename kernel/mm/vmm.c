@@ -81,11 +81,38 @@ page_directory_t* vmm_create_directory(void)
     for (int i = 0; i < 1024; i++)
         dir->entries[i] = 0;
 
-    /* Copiar las entradas del kernel (mitad alta 0x80000000+) para que
-     * las syscalls funcionen sin cambiar CR3 — igual que Windows NT */
+    /* Copiar las entradas del kernel para que las syscalls funcionen
+     * sin cambiar CR3. Esto incluye tanto la "mitad alta" (0x80000000+)
+     * como el mapeo de identidad de la memoria baja (incluyendo VGA).
+     * Las entradas ya tienen PTE_USER=0, por lo que los procesos no pueden
+     * acceder a ellas directamente desde Ring 3. */
     if (g_kernel_dir) {
-        for (int i = 512; i < 1024; i++)
-            dir->entries[i] = g_kernel_dir->entries[i];
+        /* copiar los mappings del kernel, y si hay page tables presentes
+         * clonarlas para que el proceso de usuario pueda acceder a todas
+         * las páginas (PTE_USER). No queremos alterar las tablas del
+         * kernel, por lo que creamos copias físicas. */
+        for (int i = 0; i < 1024; i++) {
+            pde_t pde = g_kernel_dir->entries[i];
+            if (!(pde & PTE_PRESENT)) {
+                dir->entries[i] = 0;
+                continue;
+            }
+            /* si el PDE apunta a una tabla, clonarla */
+            page_table_t* orig = (page_table_t*)(pde & ~0xFFF);
+            uint32_t new_phys = pmm_alloc_frame();
+            if (!new_phys) {
+                /* fallar limpiamente manteniendo solo kernel mapping */
+                dir->entries[i] = pde | PTE_USER;
+                continue;
+            }
+            page_table_t* newtbl = (page_table_t*)new_phys;
+            /* copiar contenido de la tabla y establecer PTE_USER en cada fila */
+            for (int j = 0; j < 1024; j++) {
+                newtbl->entries[j] = orig->entries[j] | PTE_USER;
+            }
+            /* instalar la nueva tabla en el directorio de usuario */
+            dir->entries[i] = new_phys | (pde & 0xFFF) | PTE_USER;
+        }
     }
 
     return dir;
@@ -97,7 +124,16 @@ void vmm_map_page(page_directory_t* dir,
 {
     uint32_t pdi = virt >> 22;          /* bits 31:22 = índice en PD */
     uint32_t pti = (virt >> 12) & 0x3FF; /* bits 21:12 = índice en PT */
-
+    /* if PDE already exists and we're requesting user access, make sure
+     * the PDE itself is user-accessible (U bit).  vmm_create_directory
+     * copies kernel PDEs with U=0, so without this the PTE U bit would be
+     * ignored and Ring 3 accesses will PF. */
+    pde_t pde = dir->entries[pdi];
+    if ((pde & PTE_PRESENT) && (flags & PTE_USER)) {
+        dir->entries[pdi] |= PTE_USER;
+        /* also propagate writability if requested */
+        if (flags & PTE_WRITABLE) dir->entries[pdi] |= PTE_WRITABLE;
+    }
     page_table_t* table = get_or_create_table(dir, pdi,
                               flags | PTE_PRESENT | PTE_WRITABLE);
     if (!table) return;

@@ -28,6 +28,7 @@
 #include "scheduler.h"
 #include "process.h"
 #include "../mm/vmm.h"
+#include "../interrupt/tss.h"
 #include <types.h>
 
 /* ── Estado del scheduler ─────────────────────────────────────────────── */
@@ -205,6 +206,10 @@ void scheduler_remove_thread(thread_t* t)
  */
 cpu_context_t* scheduler_tick(cpu_context_t* ctx)
 {
+    /* actualizar contador de ticks utilizado por SYS_GET_TICK */
+    extern void syscall_tick_increment(void);
+    syscall_tick_increment();
+
     /*
      * Invariante de seguridad: si algo falla, devolvemos 'ctx' (el
      * contexto actual) para que el sistema siga vivo aunque no cambie.
@@ -231,6 +236,10 @@ cpu_context_t* scheduler_tick(cpu_context_t* ctx)
 
     /* 5. Quantum agotado: buscar el siguiente thread READY */
     thread_t* next = queue_next_ready(sched_current);
+    if (next && next != sched_current) {
+        extern void serial_puts(const char*);
+        serial_puts("[sched] found next thread\r\n");
+    }
 
     /* Si no hay otro thread disponible, continuar con el actual */
     if (!next || next == sched_current) {
@@ -254,6 +263,10 @@ cpu_context_t* scheduler_tick(cpu_context_t* ctx)
         if (np && np->page_dir)
             load_cr3((uint32_t)np->page_dir);
     }
+
+    /* 8. Actualizar ESP0 del TSS para el nuevo thread */
+    extern void tss_set_esp0(uint32_t esp0);
+    tss_set_esp0(next->kernel_stack_top);
 
     /* 8. Actualizar puntero al thread actual */
     proc_set_current_thread(next);

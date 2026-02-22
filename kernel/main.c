@@ -6,8 +6,8 @@
 #include "mm/vmm.h"
 #include "proc/process.h"
 #include "proc/scheduler.h"
-//#include "interrupt/tss.h"
-//#include "interrupt/syscall.h"
+#include "interrupt/tss.h"
+#include "interrupt/syscall.h"
 #include "boot_splash.h"
 #include <kstdlib.h>
 
@@ -15,7 +15,7 @@
 #include "../drivers/input/ps2mouse.h"
 
 /* Forward declarations */
-extern void gdt_init(void);
+#include "interrupt/gdt.h"   /* gdt_init + gdt_install_tss */
 extern void idt_init(void);
 
 /* Driver declarations */
@@ -37,7 +37,7 @@ extern NTSTATUS IoCreateDriver(PUNICODE_STRING, PDRIVER_INITIALIZE);
 extern NTSTATUS VgaDriverEntry(void*, PUNICODE_STRING);
 extern NTSTATUS HalInitializeDisplay(void);
 extern void VgaDrawDemo(void);
-extern void GuiMainLoop(void);
+/* GuiMainLoop ahora corre en espacio de usuario */
 /* extern void MouseInit(void);  moved to ps2mouse.h */
 
 void kernel_panic(const char* message)
@@ -76,6 +76,12 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
      */
     heap_init();
 
+    /* iniciar la consola serial para facilitar la depuración en QEMU */
+    extern void serial_init(void);
+    extern void serial_puts(const char*);
+    serial_init();
+    serial_puts("[boot] serial init\r\n");
+
     gdt_init();
     idt_init();
 
@@ -99,6 +105,21 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     /* Clear screen and setup colors */
     screen_clear();
     screen_set_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
+
+    /* Mostrar primera PF ocurrida antes de inicialización completa */
+    extern volatile uint32_t g_last_pf_addr;
+    if (g_last_pf_addr) {
+        screen_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+        screen_write("EARLY PF @ 0x");
+        uint32_t v = g_last_pf_addr;
+        char buf[9];
+        for (int i = 0; i < 8; i++)
+            buf[i] = "0123456789ABCDEF"[(v >> ((7 - i) * 4)) & 0xF];
+        buf[8] = '\0';
+        screen_writeln(buf);
+        /* Detener el boot para facilitar depuración */
+        kernel_halt();
+    }
 
     /* Header UG */
     screen_writeln("================================================================================");
@@ -160,17 +181,45 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     /* TSS: necesario para Ring 3 → Ring 0 en syscalls e interrupciones.
      * Debe inicializarse DESPUES de gdt_init() y vmm_init().
      * gdt_install_tss() extiende la GDT con el descriptor del TSS en entrada 5. */
-    //tss_init();
+        /* TSS: necesario para Ring 3 → Ring 0 en syscalls e interrupciones.
+     * Debe inicializarse DESPUES de gdt_init() y vmm_init().
+     * gdt_install_tss() extiende la GDT con el descriptor del TSS en entrada 5.
+     */
+    tss_init();
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] TSS inicializado (selector 0x28)");
 
     /* Gestor de procesos: crear proceso idle (PID 0) */
     proc_init();
+    /* Inicializar ESP0 para el thread idle recién creado */
+    {
+        thread_t* idle = proc_current_thread();
+        if (idle) {
+            extern void tss_set_esp0(uint32_t esp0);
+            tss_set_esp0(idle->kernel_stack_top);
+        }
+    }
     screen_set_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
     screen_writeln("[OK] Gestor de procesos inicializado");
 
     if (!NT_SUCCESS(HalInitializeDisplay())) {
         kernel_panic("Failed to initialize display");
+    }
+
+    /* volver a chequear si un PF ocurrió justo antes de cambiar a vídeo */
+    {
+        extern volatile uint32_t g_last_pf_addr;
+        if (g_last_pf_addr) {
+            screen_set_color(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
+            screen_write("LATE PF @ 0x");
+            uint32_t v = g_last_pf_addr;
+            char buf[9];
+            for (int i = 0; i < 8; i++)
+                buf[i] = "0123456789ABCDEF"[(v >> ((7 - i) * 4)) & 0xF];
+            buf[8] = '\0';
+            screen_writeln(buf);
+            kernel_halt();
+        }
     }
 
     MouseInit();
@@ -198,12 +247,51 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     }
     /* NOTA: screen_writeln() ya no funciona aqui (modo grafico activo) */
 
-    /* gui_server como kernel thread Ring 0 */
-	proc_create_kernel("gui_server", GuiMainLoop);
+    /* dump bytes from both potential buffers so we know qué memoria
+       está interpretando el emulador. */
+    serial_puts("[VGA] buffer @A0000:");
+    for (int i = 0; i < 16; i++) {
+        uint8_t b = *((volatile uint8_t*)0xA0000 + i);
+        char buf[5] = "  0";
+        const char *hex = "0123456789ABCDEF";
+        buf[1] = hex[(b >> 4) & 0xF];
+        buf[2] = hex[b & 0xF];
+        buf[3] = ' ';
+        buf[4] = '\0';
+        serial_puts(buf);
+    }
+    serial_puts("\r\n[VGA] buffer @B8000:");
+    for (int i = 0; i < 16; i++) {
+        uint8_t b = *((volatile uint8_t*)0xB8000 + i);
+        char buf[5] = "  0";
+        const char *hex = "0123456789ABCDEF";
+        buf[1] = hex[(b >> 4) & 0xF];
+        buf[2] = hex[b & 0xF];
+        buf[3] = ' ';
+        buf[4] = '\0';
+        serial_puts(buf);
+    }
+    serial_puts("\r\n");
+
+    /* gui_server como proceso de usuario Ring 3 */
+    {
+        serial_puts("[boot] creating gui_server\r\n");
+        extern uint8_t _user_start[];
+        extern uint8_t _user_end[];
+        extern void user_entry(void);
+
+        uint32_t code_phys = (uint32_t)_user_start;
+        uint32_t code_size = (uint32_t)(_user_end - _user_start);
+        if (!proc_create_user("gui_server", code_phys, code_size,
+                              (uint32_t)user_entry)) {
+            kernel_panic("Failed to create GUI user process");
+        }
+    }
 	
     /* Inicializar el scheduler.
      * proc_create_kernel() ya llamo scheduler_add_thread() internamente
      * para el thread del gui_server. El idle lo anade scheduler_init(). */
+    serial_puts("[boot] scheduler init\r\n");
     scheduler_init();
 
     /* NOTA: No llamar screen_writeln aqui - VGA ya esta en modo grafico */

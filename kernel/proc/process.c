@@ -243,6 +243,46 @@ process_t* proc_create_user(const char* name,
                              uint32_t code_size,
                              uint32_t entry_virt)
 {
+    /* DEBUG: mostrar parámetros de la imagen de usuario
+     * (también los emitimos por serial para poder analizarlos en logs) */
+    extern void screen_writeln(const char*);
+    extern void screen_write(const char*);
+    extern void serial_puts(const char*);
+    /* debug: dump start/address/size as hex (buf removed) */
+    screen_write("user start=0x");
+    serial_puts("user start=0x");
+    /* simple hexdump without printf */
+    {
+        uint32_t v = code_phys;
+        for (int i = 28; i >= 0; i -= 4) {
+            char c = "0123456789ABCDEF"[(v >> i) & 0xF];
+            char s[2] = {c,0}; screen_write(s);
+        }
+        screen_writeln("");
+        serial_puts("\r\n");
+    }
+    screen_write("entry=0x");
+    serial_puts("entry=0x");
+    {
+        uint32_t v = entry_virt;
+        for (int i = 28; i >= 0; i -= 4) {
+            char c = "0123456789ABCDEF"[(v >> i) & 0xF];
+            char s[2] = {c,0}; screen_write(s);
+        }
+        screen_writeln("");
+        serial_puts("\r\n");
+    }
+    screen_write("size=0x");
+    serial_puts("size=0x");
+    {
+        uint32_t v = code_size;
+        for (int i = 28; i >= 0; i -= 4) {
+            char c = "0123456789ABCDEF"[(v >> i) & 0xF];
+            char s[2] = {c,0}; screen_write(s);
+        }
+        screen_writeln("");
+    }
+
     process_t* proc = alloc_process();
     if (!proc) return NULL;
 
@@ -262,10 +302,19 @@ process_t* proc_create_user(const char* name,
     uint32_t pages = (code_size + PAGE_SIZE - 1) / PAGE_SIZE;
 
     for (uint32_t p = 0; p < pages; p++) {
+        /* mapeo de pagina para procesos de usuario
+         * notas:
+         * - Antes marcabamos solo PTE_USER, que deja las paginas como
+         *   read-only. Esto causaba fallos al escribir en .user.data
+         *   (p.ej. el buffer del cursor) porque el slot no era escribible.
+         *   Para la prueba de GUI es más sencillo mapear TODO el espacio
+         *   de usuario como escribible; podemos refinar si queremos
+         *   volver a proteger el codigo.
+         */
         vmm_map_page(proc->page_dir,
                      virt + p * PAGE_SIZE,
                      phys + p * PAGE_SIZE,
-                     PTE_PRESENT | PTE_USER);   /* solo lectura para código */
+                     PTE_PRESENT | PTE_USER | PTE_WRITABLE);
     }
 
     /* Mapear stack de usuario */
@@ -300,6 +349,22 @@ process_t* proc_create_user(const char* name,
                                          USER_STACK_TOP - 4);
 
     proc->main_thread = t;
+
+    /* Fix: algunas funciones en .user (como user_entry) usan PIC y
+     * llaman a __x86.get_pc_thunk.* situado en la sección .text del
+     * kernel. Esas páginas no están accesibles a Ring 3, provocando
+     * page faults al entrar. Mapeamos explícitamente la página que
+     * contiene el thunk para que el proceso pueda ejecutarlo. */
+    {
+        const uint32_t thunk_addr = 0x00106ccb;
+        uint32_t page = thunk_addr & ~(PAGE_SIZE - 1);
+        vmm_map_page(proc->page_dir, page, page,
+                     PTE_PRESENT | PTE_USER /* no escribible */);
+    }
+
+    /* Registrar el thread en la cola del scheduler para que pueda correr */
+    scheduler_add_thread(t);
+
     return proc;
 }
 

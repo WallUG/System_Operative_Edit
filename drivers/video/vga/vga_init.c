@@ -101,8 +101,10 @@ NTSTATUS VgaSetMode(UCHAR Mode)
 {
     int i;
 
+    serial_puts("[VGA] VgaSetMode called\r\n");
     if (Mode == VGA_MODE_GRAPHICS_640x480x16)
     {
+        serial_puts("[VGA] switching to graphics mode\r\n");
         /* 0. Reset sincrono del Sequencer antes de cualquier cambio.
          *    GRUB puede dejar el Sequencer en un estado con Shift4/Shift Load
          *    activos (Clocking Mode bits 4,3) que causan mirror horizontal.
@@ -155,6 +157,7 @@ NTSTATUS VgaSetMode(UCHAR Mode)
         /* 8. Paleta de colores estandar */
         VgaInitializePalette();
 
+        serial_puts("[VGA] graphics mode set\r\n");
         return STATUS_SUCCESS;
     }
     else if (Mode == VGA_MODE_TEXT_80x25)

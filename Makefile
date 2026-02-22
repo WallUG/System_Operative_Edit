@@ -7,7 +7,10 @@ AS = nasm
 LD = ld
 
 # Flags de compilación
-CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -Wall -Wextra -I./include -I./drivers
+# Se activa -O1 para permitir (entre otras cosas) que los wrappers inline de
+# syscalls realmente se expandan dentro de user_entry, evitando llamadas al
+# código en el kernel que provocarían PFs en Ring 3.
+CFLAGS = -O1 -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -Wall -Wextra -I./include -I./drivers
 ASFLAGS = -f elf32
 LDFLAGS = -m elf_i386
 
@@ -26,21 +29,36 @@ ISO_FILE = os.iso
 
 # Archivos fuente del kernel
 KERNEL_SOURCES = $(wildcard $(KERNEL_DIR)/*.c) $(wildcard $(KERNEL_DIR)/**/*.c)
+
+# código de usuario (GUI) que debe compilarse junto al kernel
+USER_SOURCES = user/gui_user.c
+
+# incluir cualquiera otra fuente de usuario futura
+
 KERNEL_OBJECTS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_SOURCES))
 
 # Archivos fuente de drivers
 DRIVER_FRAMEWORK_SOURCES = $(wildcard $(DRIVERS_DIR)/framework/*.c)
-DRIVER_VIDEO_SOURCES = $(wildcard $(DRIVERS_DIR)/video/vga/*.c)
+# Los archivos de video incluyen varios drivers; vga_mouse.c está obsoleto y tiene un #error.
+# Filtramos ese archivo para que no cause fallos en la compilación.
+DRIVER_VIDEO_SOURCES = $(filter-out $(DRIVERS_DIR)/video/vga/vga_mouse.c, $(wildcard $(DRIVERS_DIR)/video/vga/*.c))
 DRIVER_HAL_SOURCES = $(wildcard $(DRIVERS_DIR)/hal/*.c)
-DRIVER_SOURCES = $(DRIVER_FRAMEWORK_SOURCES) $(DRIVER_VIDEO_SOURCES) $(DRIVER_HAL_SOURCES)
+# añadir controladores de entrada PS/2
+DRIVER_INPUT_SOURCES = $(wildcard $(DRIVERS_DIR)/input/*.c)
+DRIVER_SOURCES = $(DRIVER_FRAMEWORK_SOURCES) $(DRIVER_VIDEO_SOURCES) $(DRIVER_HAL_SOURCES) $(DRIVER_INPUT_SOURCES)
 DRIVER_OBJECTS = $(patsubst $(DRIVERS_DIR)/%.c, $(BUILD_DIR)/drivers_%.o, $(DRIVER_SOURCES))
 
 # Archivos fuente de lib
 LIB_SOURCES = $(wildcard $(LIB_DIR)/*.c)
 LIB_OBJECTS = $(patsubst $(LIB_DIR)/%.c, $(BUILD_DIR)/lib_%.o, $(LIB_SOURCES))
 
-# Todos los objetos (boot + kernel + drivers + lib)
-ALL_OBJECTS = $(BOOT_OBJ) $(KERNEL_OBJECTS) $(DRIVER_OBJECTS) $(LIB_OBJECTS)
+# Objetos del kernel
+KERNEL_OBJECTS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL_SOURCES))
+# objetos de usuario
+USER_OBJECTS = $(patsubst user/%.c,$(BUILD_DIR)/user_%.o,$(USER_SOURCES))
+
+# Todos los objetos (boot + kernel + usuario + drivers + lib)
+ALL_OBJECTS = $(BOOT_OBJ) $(KERNEL_OBJECTS) $(USER_OBJECTS) $(DRIVER_OBJECTS) $(LIB_OBJECTS)
 
 # Target por defecto
 .PHONY: all
@@ -71,6 +89,12 @@ $(BUILD_DIR)/kernel_%.o: $(KERNEL_DIR)/%.c
 	@echo "Compilando $<..."
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# regla para fuentes de usuario (sin PIC!)
+$(BUILD_DIR)/user_%.o: user/%.c
+	@echo "Compilando usuario $< (no-PIC)..."
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -fno-pic -fno-pie -c $< -o $@
 
 $(BUILD_DIR)/drivers_%.o: $(DRIVERS_DIR)/%.c
 	@echo "Compilando driver $<..."
