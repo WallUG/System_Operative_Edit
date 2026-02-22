@@ -11,6 +11,9 @@ Este directorio contiene toda la documentación del proyecto.
    - Componentes principales
    - Flujo de arranque
    - Interacción entre componentes
+   - **Detalle reciente:** Interfaz de llamadas al sistema y ejecución de GUI en
+     Ring 3, con corrección de errores en el stub de syscall (evitar sobrescribir
+     argumentos).
 
 2. **[Roadmap de Desarrollo](roadmap.md)**
    - Plan de desarrollo por fases

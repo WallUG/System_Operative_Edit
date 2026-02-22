@@ -179,6 +179,27 @@ typedef struct _THREAD {
 48+:    Interrupciones de software (syscalls)
 ```
 
+#### 3.4 Interfaz de Llamadas al Sistema
+
+El mecanismo de syscalls utiliza el vector 0x30. El código de usuario prepara los
+argumentos en los registros (EBX, ECX, EDX, ESI, EDI) y pone el número de llamada
+en EAX antes de ejecutar `int 0x30`. En el kernel el stub `syscall_entry` salva
+los registros de propósito general, cambia a segmentos de kernel y empuja el
+número de syscall y los cinco argumentos en orden cdecl para invocar
+`syscall_dispatch`.
+
+> **Nota importante**: un error previo en la implementación movía el número de
+> syscall desde EAX hacia EDX antes de empujar los parámetros, sobrescribiendo
+> el tercer argumento. Eso hacía que todas las `SYS_FILL_RECT` recibieran el
+> valor `3` en vez de la anchura real, provocando que sólo se dibujaran tres
+> píxeles por línea y produjera franjas en la pantalla. La corrección consiste
+> en guardar el número en EBP y no tocar EDX hasta después de empujar los
+> demás parámetros.
+
+Esta interfaz ahora está completamente funcional y permite ejecutar el servidor
+GUI en Ring 3 con memoria separada, usando syscalls para dibujar el escritorio,
+ventanas y cursor.
+
 ### 4. Executive Services
 
 **Propósito**: Servicios de alto nivel del sistema.
