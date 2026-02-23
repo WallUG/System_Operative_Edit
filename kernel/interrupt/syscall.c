@@ -5,6 +5,7 @@
 #include "../drivers/video/vga/vga.h"    /* funciones VGA */
 #include "../drivers/video/vga/vga_font.h" /* VgaDrawString */
 #include "../drivers/input/ps2mouse.h" /* MOUSE_STATE */
+#include <gui.h>           /* GUI_WINDOW, GUI_MOUSE_EVENT */
 #include "../../include/libsys.h"  /* definiciones de SYS_MOUSE, etc. */
 #include <types.h>
 
@@ -217,8 +218,6 @@ uint32_t syscall_dispatch(uint32_t num, uint32_t a, uint32_t b,
         /* b = pointer to SYS_MOUSE */
         if (!is_user_ptr((const void*)b)) { ret = (uint32_t)-1; break; }
         SYS_MOUSE ms;
-        /* obtener estado (el driver global lo actualiza en IRQ1) */
-        /* usar la API del driver para leer el estado */
         {
             extern MOUSE_STATE* MouseGetState(void);
             MOUSE_STATE* cur = MouseGetState();
@@ -230,11 +229,97 @@ uint32_t syscall_dispatch(uint32_t num, uint32_t a, uint32_t b,
                 ms.x = ms.y = ms.buttons = 0;
             }
         }
-        /* copiar al usuario */
         if (copy_from_user((void*)b, &ms, sizeof(ms)) != 0)
             ret = (uint32_t)-1;
         else
             ret = 0;
+        break;
+    }
+    case SYS_GET_MOUSE_EVENT: {
+        /* pop next event from GUI queue */
+        GUI_MOUSE_EVENT evt;
+        extern int GuiGetMouseEvent(GUI_MOUSE_EVENT*);
+        if (GuiGetMouseEvent(&evt) != 0) {
+            ret = (uint32_t)-1; /* no event */
+            break;
+        }
+        if (!is_user_ptr((const void*)b)) { ret = (uint32_t)-1; break; }
+        if (copy_from_user((void*)b, &evt, sizeof(evt)) != 0) {
+            ret = (uint32_t)-1;
+        } else {
+            ret = 0;
+        }
+        break;
+    }
+    case SYS_SET_CURSOR_POS: {
+        /* a=x, b=y */
+        extern void CursorErase(int32_t, int32_t);
+        extern void CursorDraw(int32_t, int32_t);
+        static int prevx = -1, prevy = -1;
+        if (prevx >= 0 && prevy >= 0) {
+            CursorErase(prevx, prevy);
+        }
+        CursorDraw((int)a, (int)b);
+        prevx = (int)a; prevy = (int)b;
+        ret = 0;
+        break;
+    }
+    case SYS_HIDE_CURSOR: {
+        extern void CursorErase(int32_t, int32_t);
+        /* simply erase at last known position */
+        static int lastx = -1, lasty = -1;
+        if (lastx >= 0 && lasty >= 0) CursorErase(lastx, lasty);
+        ret = 0;
+        break;
+    }
+    case SYS_SHOW_CURSOR: {
+        /* nothing special, cursor will be drawn on next move */
+        ret = 0;
+        break;
+    }
+    case SYS_GUI_DRAW_DESKTOP: {
+        extern void GuiDrawDesktop(void);
+        GuiDrawDesktop();
+        ret = 0;
+        break;
+    }
+    case SYS_GUI_DRAW_TASKBAR: {
+        extern void GuiDrawTaskbar(void);
+        GuiDrawTaskbar();
+        ret = 0;
+        break;
+    }
+    case SYS_GUI_DRAW_WINDOW: {
+        /* b = pointer to GUI_WINDOW */
+        if (!is_user_ptr((const void*)b)) { ret = (uint32_t)-1; break; }
+        GUI_WINDOW win;
+        if (copy_from_user(&win, (const void*)b, sizeof(win)) != 0) {
+            ret = (uint32_t)-1; break;
+        }
+        extern void GuiDrawWindow(const GUI_WINDOW*);
+        GuiDrawWindow(&win);
+        ret = 0;
+        break;
+    }
+    case SYS_GUI_DRAW_WINDOW_TEXT: {
+        /* a = pointer to GUI_WINDOW, b=rx, c=ry, d=pointer to string, e=fg */
+        GUI_WINDOW win;
+        if (!is_user_ptr((const void*)a) || !is_user_ptr((const void*)d)) { ret = (uint32_t)-1; break; }
+        if (copy_from_user(&win, (const void*)a, sizeof(win)) != 0) { ret = (uint32_t)-1; break; }
+        /* copy string to local buffer */
+        char buf[128];
+        int i;
+        const char *src = (const char*)d;
+        for (i = 0; i < (int)sizeof(buf)-1; i++) {
+            if (!is_user_ptr(src + i)) { ret = (uint32_t)-1; break; }
+            buf[i] = src[i];
+            if (buf[i] == '\0') break;
+        }
+        if (ret != 0) break;
+        buf[sizeof(buf)-1] = '\0';
+        extern void GuiDrawWindowText(const GUI_WINDOW*, int, int, const char*, UCHAR);
+        GuiDrawWindowText(&win, (int)b, (int)c, buf, (UCHAR)e);
+        ret = 0;
         break;
     }
     case SYS_GET_PIXEL:

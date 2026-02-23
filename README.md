@@ -141,16 +141,27 @@ Si VGA no está disponible, verás:
 - [Boot Animation Text](boot/freeldr/BOOT_ANIMATION.md) - Modo texto fallback
 
 ### Kernel
-El kernel mostrará un mensaje de bienvenida con branding institucional y luego:
+El kernel ahora incorpora un **servicio GUI** que administra el escritorio,
+ventanas y cursor en Ring 0. Las aplicaciones de usuario dibujan mediante
+syscalls de alto nivel en lugar de llamar píxel por píxel, lo que mejora el
+rendimiento y la estabilidad. Además el cursor se gestiona internamente y no
+requiere código de usuario.
+
+Al arrancar, el kernel mostrará un mensaje de bienvenida con branding
+institucional y luego:
 1. Inicializa el HAL (Hardware Abstraction Layer)
 2. Inicializa el I/O Manager
 3. Carga el driver VGA en modo gráfico 640×480×16 colores
-4. Inicializa el HAL Display
+4. Inicializa el HAL Display y el servicio GUI
 5. Dibuja un patrón de demostración con:
    - Barras de colores (16 colores VGA)
    - Rectángulos rellenos en colores primarios
    - Líneas horizontales y diagonales
    - Bordes alrededor de la pantalla
+
+La GUI de ejemplo del usuario muestra ahora un escritorio, una ventana de
+bienvenida, una barra de tareas animada con reloj y un botón "Start" que
+abre una consola simple al hacer clic.
 
 ```
 ================================================================================

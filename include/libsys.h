@@ -19,6 +19,7 @@
 #define _LIBSYS_H
 
 #include <types.h>
+#include <gui.h>   /* needed for GUI_WINDOW in wrappers */
 
 /* Números de syscall (deben coincidir con syscall.h del kernel) */
 #define SYS_EXIT        0x00
@@ -32,7 +33,15 @@
 #define SYS_GET_PIXEL        0x08   /* Leer pixel del shadow buffer (x, y) -> color 0-15 */
 #define SYS_DEBUG            0x09   /* imprime cadena en serial */
 #define SYS_DUMP_VRAM        0x0A   /* debug: print portion of VGA memory */
-
+/* nuevos syscalls para cursor y servicio GUI */
+#define SYS_GET_MOUSE_EVENT   0x0B   /* obtener próximo evento de mouse */
+#define SYS_SET_CURSOR_POS    0x0C   /* actualizar posición del cursor */
+#define SYS_HIDE_CURSOR       0x0D
+#define SYS_SHOW_CURSOR       0x0E
+#define SYS_GUI_DRAW_DESKTOP      0x0F
+#define SYS_GUI_DRAW_TASKBAR      0x10
+#define SYS_GUI_DRAW_WINDOW       0x11
+#define SYS_GUI_DRAW_WINDOW_TEXT  0x12
 /* Estado del mouse (misma estructura que el kernel) */
 typedef struct {
     int x;
@@ -198,6 +207,108 @@ static inline __attribute__((always_inline)) uint32_t sys_get_pixel(int x, int y
         "int $0x30"
         : "=a"(ret)
         : [num]"i"(SYS_GET_PIXEL), "b"(x), "c"(y)
+        : "memory"
+    );
+    return ret;
+}
+
+/* cursor control */
+static inline uint32_t sys_set_cursor_pos(int x, int y)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_SET_CURSOR_POS), "b"(x), "c"(y)
+        : "memory"
+    );
+    return ret;
+}
+static inline uint32_t sys_hide_cursor(void)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_HIDE_CURSOR)
+        : "memory"
+    );
+    return ret;
+}
+static inline uint32_t sys_show_cursor(void)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_SHOW_CURSOR)
+        : "memory"
+    );
+    return ret;
+}
+
+/* get next mouse event (x,y,buttons) from kernel queue */
+static inline uint32_t sys_get_mouse_event(SYS_MOUSE* out)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_GET_MOUSE_EVENT), "b"(out)
+        : "memory"
+    );
+    return ret;
+}
+
+/* servicios GUI de alto nivel */
+static inline uint32_t sys_gui_draw_desktop(void)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_GUI_DRAW_DESKTOP)
+        : "memory"
+    );
+    return ret;
+}
+static inline uint32_t sys_gui_draw_taskbar(void)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_GUI_DRAW_TASKBAR)
+        : "memory"
+    );
+    return ret;
+}
+static inline uint32_t sys_gui_draw_window(const GUI_WINDOW* w)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_GUI_DRAW_WINDOW), "b"(w)
+        : "memory"
+    );
+    return ret;
+}
+static inline uint32_t sys_gui_draw_window_text(const GUI_WINDOW* w, int rx, int ry, const char* txt, uint8_t fg)
+{
+    uint32_t ret;
+    __asm__ volatile(
+        "mov %[num], %%eax\n"
+        "int $0x30"
+        : "=a"(ret)
+        : [num]"i"(SYS_GUI_DRAW_WINDOW_TEXT), "b"(w), "c"(rx), "d"(ry), "S"(txt), "D"(fg)
         : "memory"
     );
     return ret;

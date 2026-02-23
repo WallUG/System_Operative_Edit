@@ -7,6 +7,8 @@
  */
 
 #include "ps2mouse.h"
+#include <gui.h>              /* eventos y estructuras compartidas */
+#include "../video/vga/vga_cursor.h" /* dibujo de cursor en kernel */
 
 /* I/O port helpers ------------------------------------------------------- */
 static inline void outb(uint16_t port, uint8_t val) {
@@ -50,6 +52,9 @@ static MOUSE_STATE g_mouse = { 320, 240, 0, 1 };
 
 void MouseInit(void) {
     uint8_t status;
+
+    /* Inicializar cursor del subsistema GUI */
+    GuiInit();
 
     /* Desenmascarar IRQ1 (teclado/PS2) en el PIC master. */
     {
@@ -112,6 +117,20 @@ void MouseRead(MOUSE_STATE* state) {
     if (g_mouse.y > 468) g_mouse.y = 468;
 
     g_mouse.buttons = flags & 0x07;
+
+    /* actualizar cursor en pantalla (kernel) */
+    static int prev_x = -1, prev_y = -1;
+    if (g_mouse.visible) {
+        if (prev_x >= 0 && prev_y >= 0) {
+            CursorErase(prev_x, prev_y);
+        }
+        CursorDraw(g_mouse.x, g_mouse.y);
+        prev_x = g_mouse.x;
+        prev_y = g_mouse.y;
+    }
+
+    /* encolar evento para procesos usuario */
+    GuiQueueMouseEvent(g_mouse.x, g_mouse.y, g_mouse.buttons);
 
     if (state) *state = g_mouse;
 }

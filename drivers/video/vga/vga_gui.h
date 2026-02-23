@@ -1,5 +1,9 @@
 /*
  * vga_gui.h - API de ventanas y controles GUI
+ *
+ * OBSOLETO: el servicio GUI ahora se encuentra en kernel/gui/gui.c y
+ * expone sus primitivas a través de syscalls. Este archivo se conserva
+ * solo para referencia histórica y ya no se compila.
  */
 #ifndef _VGA_GUI_H
 #define _VGA_GUI_H

@@ -61,32 +61,9 @@ PDEVICE_OBJECT VgaGetDeviceObject(VOID)
  */
 VOID VgaPutPixel(INT x, INT y, UCHAR Color)
 {
-    /* debug: log more draws so we can see coverage on bad lines */
-    static int dbg_count = 0;
-    if (dbg_count < 2000) {
-        extern void serial_puts(const char*);
-        char buf[64];
-        int n = 0;
-        buf[n++]='v'; buf[n++]='p'; buf[n++]='i'; buf[n++]='x'; buf[n++]='e'; buf[n++]='l'; buf[n++]=' ';
-        int tx = x;
-        if (tx < 0) { buf[n++]='-'; tx = -tx; }
-        char tmp[12]; int ti=0;
-        do { tmp[ti++] = '0' + (tx % 10); tx /= 10; } while (tx);
-        while (ti) buf[n++] = tmp[--ti];
-        buf[n++]=',';
-        int ty = y;
-        if (ty < 0) { buf[n++]='-'; ty = -ty; }
-        ti = 0; do { tmp[ti++] = '0' + (ty % 10); ty /= 10; } while (ty);
-        while (ti) buf[n++] = tmp[--ti];
-        buf[n++]=' ';
-        buf[n++]='c'; buf[n++]='o'; buf[n++]='l'; buf[n++]='=';
-        int tc = Color;
-        ti = 0; do { tmp[ti++] = '0' + (tc % 10); tc /= 10; } while (tc);
-        while (ti) buf[n++] = tmp[--ti];
-        buf[n++]='\r'; buf[n++]='\n'; buf[n]=0;
-        serial_puts(buf);
-        dbg_count++;
-    }
+    /* esta función se llama desde múltiples sitios, evitar el depurador una vez
+       el sistema haya arrancado para no desperdiciar tiempo en I/O serial. */
+    (void)x; (void)y; (void)Color;
 
     PVGA_DEVICE_EXTENSION DevExt;
     PUCHAR FrameBuffer;
@@ -117,18 +94,7 @@ VOID VgaPutPixel(INT x, INT y, UCHAR Color)
             if (col & (1 << p))
                 planeValue |= (0x80 >> b);
         }
-        /* debug: log planeValue for the first few columns of each row */
-        if (x < 10 && dbg_count < 10000) {
-            extern void serial_puts(const char*);
-            char buf[40]; int n=0;
-            buf[n++] = 'p'; buf[n++] = 'l'; buf[n++] = 'a'; buf[n++] = 'n'; buf[n++] = 'e';
-            buf[n++] = '0' + p; buf[n++] = '=';
-            const char *hex="0123456789ABCDEF";
-            buf[n++] = hex[(planeValue>>4)&0xF];
-            buf[n++] = hex[planeValue&0xF];
-            buf[n++]='\n'; buf[n]=0;
-            serial_puts(buf);
-        }
+        /* previously we logged plane values for debugging; removed in production */
 
         /* select plane via sequencer mask */
         VgaWriteSequencer(2, 1 << p);
@@ -191,15 +157,61 @@ VOID VgaClearScreen(UCHAR Color)
  */
 VOID VgaFillRect(INT x, INT y, INT width, INT height, UCHAR Color)
 {
-    /* fall back to pixel-by-pixel writes using the same mechanism as
-       VgaPutPixel.  This sacrifices performance but guarantees correct
-       plane updates under emulators that ignore the graphics controller
-       map mask / write mode features. */
     if (width <= 0 || height <= 0) return;
 
+    /* actualizar shadow primero */
     for (INT row = 0; row < height; row++) {
+        int yy = y + row;
+        if (yy < 0 || yy >= SHADOW_H) continue;
         for (INT col = 0; col < width; col++) {
-            VgaPutPixel(x + col, y + row, Color);
+            int xx = x + col;
+            if (xx < 0 || xx >= SHADOW_W) continue;
+            g_shadow[yy * SHADOW_W + xx] = Color;
+        }
+    }
+
+    /* intentar rellenar por bytes cuando esté alineado a 8 píxeles */
+    if (!g_VgaDevice) return;
+    PVGA_DEVICE_EXTENSION DevExt = (PVGA_DEVICE_EXTENSION)g_VgaDevice->DeviceExtension;
+    if (!DevExt || !DevExt->GraphicsMode) return;
+
+    PUCHAR FrameBuffer = (PUCHAR)DevExt->FrameBuffer;
+    int screenW = DevExt->ScreenWidth;
+    int bytes_per_row = screenW / 8;
+
+    for (INT row = 0; row < height; row++) {
+        int yy = y + row;
+        if (yy < 0 || yy >= DevExt->ScreenHeight) continue;
+        PUCHAR dest = FrameBuffer + (ULONG)yy * bytes_per_row;
+        int start = x;
+        int end = x + width;
+
+        /* manejar parte inicial no alineada a 8 */
+        while (start < end && (start & 7)) {
+            VgaPutPixel(start, yy, Color);
+            start++;
+        }
+        /* manejar segmentos completos de 8 píxeles */
+        if (start + 8 <= end) {
+            int fullBytes = (end - start) / 8;
+            UCHAR planeMask[4];
+            for (int p = 0; p < 4; p++)
+                planeMask[p] = (Color & (1 << p)) ? 0xFF : 0x00;
+            int baseIndex = start / 8;
+            for (int p = 0; p < 4; p++) {
+                VgaWriteSequencer(2, 1 << p);
+                PUCHAR ptr = dest + baseIndex;
+                for (int b = 0; b < fullBytes; b++) {
+                    ptr[b] = planeMask[p];
+                }
+            }
+            VgaWriteSequencer(2, 0x0F);
+            start += fullBytes * 8;
+        }
+        /* manejar parte final parcial */
+        while (start < end) {
+            VgaPutPixel(start, yy, Color);
+            start++;
         }
     }
 }

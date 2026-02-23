@@ -15,6 +15,18 @@
 #define SYS_DEBUG            0x09   /* imprimir cadena en serial para depuración */
 #define SYS_DUMP_VRAM        0x0A   /* debug: dump first part of VGA memory */
 
+/* nuevos syscalls para el servicio GUI y cursor */
+#define SYS_GET_MOUSE_EVENT   0x0B   /* obtener próximo evento de mouse */
+#define SYS_SET_CURSOR_POS    0x0C   /* (x,y) */
+#define SYS_HIDE_CURSOR       0x0D
+#define SYS_SHOW_CURSOR       0x0E
+
+#define SYS_GUI_DRAW_DESKTOP      0x0F
+#define SYS_GUI_DRAW_TASKBAR      0x10
+#define SYS_GUI_DRAW_WINDOW       0x11   /* pointer a GUI_WINDOW */
+#define SYS_GUI_DRAW_WINDOW_TEXT  0x12   /* a=pointer, b=rx, c=ry, d=pointer, e=fg */
+#define SYS_GUI_DRAW_BUTTON       0x13   /* a=x,b=y,c=w,d=h,e=pressed, pointer label in esi */
+
 #define SYSCALL_ERR      ((uint32_t)-1)
 
 #endif /* _SYSCALL_H */

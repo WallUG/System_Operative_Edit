@@ -200,6 +200,25 @@ Esta interfaz ahora está completamente funcional y permite ejecutar el servidor
 GUI en Ring 3 con memoria separada, usando syscalls para dibujar el escritorio,
 ventanas y cursor.
 
+#### 3.5 Servicio GUI (nuevo)
+
+El subsistema gráfico ha sido reorganizado como un servicio en el kernel que
+ofrece primitivas de alto nivel a través de llamadas al sistema. El servicio:
+
+- Mantiene un *shadow framebuffer* y gestiona el cursor (dibujado en modo
+  protegido), liberando procesos de usuario de operaciones de pixel individuales.
+- Proporciona funciones `GuiDrawDesktop`, `GuiDrawWindow`, `GuiDrawTaskbar`,
+  etc. que se invocan desde syscalls como `SYS_GUI_DRAW_DESKTOP`.
+- Implementa una cola de eventos de ratón (`GuiQueueMouseEvent` /
+  `SYS_GET_MOUSE_EVENT`), permitiendo a las aplicaciones leer movimientos y
+  clics sin subir constantes del estado del dispositivo.
+- Contiene lógica de interacción básica (por ejemplo, detección de clic en el
+  botón "Start" y un pequeño "consola" emergente).
+
+El servidor GUI en Ring 3 (`user/gui_user.c`) usa estas llamadas de manera
+ligera, lo que mejora el rendimiento, separa capas de responsabilidad y
+incrementa la estabilidad del sistema.
+
 ### 4. Executive Services
 
 **Propósito**: Servicios de alto nivel del sistema.

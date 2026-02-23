@@ -28,7 +28,8 @@ BOOT_OBJ = $(BUILD_DIR)/boot.o
 ISO_FILE = os.iso
 
 # Archivos fuente del kernel
-KERNEL_SOURCES = $(wildcard $(KERNEL_DIR)/*.c) $(wildcard $(KERNEL_DIR)/**/*.c)
+# incluir también cualquier fuente nueva en subdirectorios como kernel/gui
+KERNEL_SOURCES = $(wildcard $(KERNEL_DIR)/*.c) $(wildcard $(KERNEL_DIR)/**/*.c) $(wildcard $(KERNEL_DIR)/gui/*.c)
 
 # código de usuario (GUI) que debe compilarse junto al kernel
 USER_SOURCES = user/gui_user.c
@@ -39,9 +40,12 @@ KERNEL_OBJECTS = $(patsubst $(KERNEL_DIR)/%.c, $(BUILD_DIR)/kernel_%.o, $(KERNEL
 
 # Archivos fuente de drivers
 DRIVER_FRAMEWORK_SOURCES = $(wildcard $(DRIVERS_DIR)/framework/*.c)
-# Los archivos de video incluyen varios drivers; vga_mouse.c está obsoleto y tiene un #error.
-# Filtramos ese archivo para que no cause fallos en la compilación.
-DRIVER_VIDEO_SOURCES = $(filter-out $(DRIVERS_DIR)/video/vga/vga_mouse.c, $(wildcard $(DRIVERS_DIR)/video/vga/*.c))
+# Los archivos de video incluyen varios drivers; algunos se consideran obsoletos.
+# vga_mouse.c contiene un #error y vga_gui.c ha sido reemplazado por el servicio GUI
+# en kernel/gui/gui.c, por lo que ambos deben filtrarse fuera de la compilación.
+DRIVER_VIDEO_SOURCES = $(filter-out $(DRIVERS_DIR)/video/vga/vga_mouse.c \
+                                   $(DRIVERS_DIR)/video/vga/vga_gui.c, \
+                                   $(wildcard $(DRIVERS_DIR)/video/vga/*.c))
 DRIVER_HAL_SOURCES = $(wildcard $(DRIVERS_DIR)/hal/*.c)
 # añadir controladores de entrada PS/2
 DRIVER_INPUT_SOURCES = $(wildcard $(DRIVERS_DIR)/input/*.c)
