@@ -157,6 +157,8 @@ VOID VgaClearScreen(UCHAR Color)
  */
 VOID VgaFillRect(INT x, INT y, INT width, INT height, UCHAR Color)
 {
+    extern void serial_puts(const char*);
+    serial_puts("[vga] VgaFillRect start\n");
     if (width <= 0 || height <= 0) return;
 
     /* actualizar shadow primero */
@@ -169,6 +171,7 @@ VOID VgaFillRect(INT x, INT y, INT width, INT height, UCHAR Color)
             g_shadow[yy * SHADOW_W + xx] = Color;
         }
     }
+    serial_puts("[vga] VgaFillRect shadow done\n");
 
     /* intentar rellenar por bytes cuando esté alineado a 8 píxeles */
     if (!g_VgaDevice) return;
@@ -214,6 +217,7 @@ VOID VgaFillRect(INT x, INT y, INT width, INT height, UCHAR Color)
             start++;
         }
     }
+    serial_puts("[vga] VgaFillRect hardware done\n");
 }
 
 /**

@@ -289,18 +289,20 @@ static inline uint32_t sys_gui_draw_taskbar(void)
     );
     return ret;
 }
-static inline uint32_t sys_gui_draw_window(const GUI_WINDOW* w)
+/* new signature: x,y,width,height,title */
+static inline uint32_t sys_gui_draw_window(int x, int y, int w, int h, const char* title)
 {
     uint32_t ret;
     __asm__ volatile(
         "mov %[num], %%eax\n"
         "int $0x30"
         : "=a"(ret)
-        : [num]"i"(SYS_GUI_DRAW_WINDOW), "b"(w)
+        : [num]"i"(SYS_GUI_DRAW_WINDOW), "b"(x), "c"(y), "d"(w), "S"(h), "D"(title)
         : "memory"
     );
     return ret;
 }
+
 static inline uint32_t sys_gui_draw_window_text(const GUI_WINDOW* w, int rx, int ry, const char* txt, uint8_t fg)
 {
     uint32_t ret;

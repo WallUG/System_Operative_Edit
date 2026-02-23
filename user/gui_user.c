@@ -47,15 +47,18 @@ void user_entry(void)
 
 
     SYS_MOUSE ms;
-    int prev_x = 320, prev_y = 240;
-    GUI_WINDOW welcome;
-    /* inicializamos campo por campo para evitar advertencias de inicializador */
-    welcome.x = 150;
-    welcome.y = 80;
-    welcome.w = 340;
-    welcome.h = 120;
-    welcome.title = USTR("Bienvenido - System Operative Edit");
-    welcome.visible = 1;
+    /* cursor se dibuja desde kernel, no necesitamos prev_x/prev_y aquí */
+    (void)ms;
+    /* ventana de bienvenida en memoria de usuario (sección .user.data) */
+    static const char welcome_title[] URODATA = "Bienvenido - System Operative Edit";
+    static GUI_WINDOW welcome UDATA = {
+        .x = 150,
+        .y = 80,
+        .w = 340,
+        .h = 120,
+        .title = welcome_title,
+        .visible = 1
+    };
 
     /* dibujar todo usando el servicio GUI del kernel */
     sys_debug(USTR("about to draw desktop\r\n"));
@@ -66,8 +69,21 @@ void user_entry(void)
     sys_gui_draw_taskbar();
     sys_debug(USTR("taskbar done\r\n"));
 
+    /* report address of welcome struct for debugging */
+    {
+        uint32_t ptr = (uint32_t)&welcome;
+        char hex[9];
+        const char *h="0123456789ABCDEF";
+        for (int i = 0; i < 8; i++) {
+            hex[7 - i] = h[(ptr >> (i * 4)) & 0xF];
+        }
+        hex[8] = '\0';
+        sys_debug(USTR("welcome addr=0x"));
+        sys_debug(hex);
+        sys_debug(USTR("\r\n"));
+    }
     sys_debug(USTR("about to draw welcome window\r\n"));
-    sys_gui_draw_window(&welcome);
+    sys_gui_draw_window(welcome.x, welcome.y, welcome.w, welcome.h, welcome_title);
     sys_debug(USTR("window done\r\n"));
 
     sys_debug(USTR("about to draw window text\r\n"));
@@ -84,12 +100,68 @@ void user_entry(void)
         uint32_t ticks = sys_get_tick();
         uint32_t secs = ticks / 100;
         if (secs != last_secs) {
+            /* debug: mostrar número de ticks y segundos obtenidos */
+            {
+                char buf[32];
+                int n = 0;
+                uint32_t tmp = ticks;
+                /* simple decimal conversion */
+                if (tmp == 0) buf[n++] = '0';
+                else {
+                    char dec[12]; int di = 0;
+                    while (tmp) { dec[di++] = '0' + (tmp % 10); tmp /= 10; }
+                    while (di--) buf[n++] = dec[di];
+                }
+                buf[n++] = ' '; buf[n++] = 't'; buf[n++] = 'i'; buf[n++] = 'c'; buf[n++] = 'k';
+                buf[n++] = '\r'; buf[n++] = '\n'; buf[n] = '\0';
+                sys_debug(buf);
+            }
             sys_gui_draw_taskbar();
             last_secs = secs;
         }
 
         /* procesar eventos de mouse */
         if (sys_get_mouse_event(&ms) == 0) {
+            /* debug: log mouse event */
+            {
+                /* convertir números a decimal manualmente */
+                char buf[64];
+                int n = 0;
+                buf[n++] = '['; buf[n++] = 'u'; buf[n++] = 's'; buf[n++] = 'e'; buf[n++] = 'r'; buf[n++] = ' ';
+                buf[n++] = 'e'; buf[n++] = 'v'; buf[n++] = 'e'; buf[n++] = 'n'; buf[n++] = 't'; buf[n++] = ']'; buf[n++] = ' ';
+                /* x value */
+                int v = ms.x;
+                if (v < 0) { buf[n++] = '-'; v = -v; }
+                {
+                    char dec[12]; int di = 0;
+                    if (v == 0) dec[di++] = '0';
+                    while (v) { dec[di++] = '0' + (v % 10); v /= 10; }
+                    while (di--) buf[n++] = dec[di];
+                }
+                buf[n++] = ' ';
+                buf[n++] = 'y'; buf[n++] = '=';
+                v = ms.y;
+                if (v < 0) { buf[n++] = '-'; v = -v; }
+                {
+                    char dec[12]; int di = 0;
+                    if (v == 0) dec[di++] = '0';
+                    while (v) { dec[di++] = '0' + (v % 10); v /= 10; }
+                    while (di--) buf[n++] = dec[di];
+                }
+                buf[n++] = ' ';
+                buf[n++] = 'b'; buf[n++] = 't'; buf[n++] = 'n'; buf[n++] = '=';
+                v = ms.buttons;
+                if (v < 0) { buf[n++] = '-'; v = -v; }
+                {
+                    char dec[12]; int di = 0;
+                    if (v == 0) dec[di++] = '0';
+                    while (v) { dec[di++] = '0' + (v % 10); v /= 10; }
+                    while (di--) buf[n++] = dec[di];
+                }
+                buf[n++] = '\r'; buf[n++] = '\n';
+                buf[n] = '\0';
+                sys_debug(buf);
+            }
             /* detectar clic en "Start" */
             if ((ms.buttons & 1) && !start_pressed &&
                 ms.x >= 2 && ms.x < 38 && ms.y >= 471 && ms.y < 471+8) {

@@ -23,7 +23,7 @@
 
 #define SYS_GUI_DRAW_DESKTOP      0x0F
 #define SYS_GUI_DRAW_TASKBAR      0x10
-#define SYS_GUI_DRAW_WINDOW       0x11   /* pointer a GUI_WINDOW */
+#define SYS_GUI_DRAW_WINDOW       0x11   /* a=x, b=y, c=w, d=h, e=pointer to title (c-string) */
 #define SYS_GUI_DRAW_WINDOW_TEXT  0x12   /* a=pointer, b=rx, c=ry, d=pointer, e=fg */
 #define SYS_GUI_DRAW_BUTTON       0x13   /* a=x,b=y,c=w,d=h,e=pressed, pointer label in esi */
 

@@ -23,6 +23,10 @@ typedef struct _MOUSE_STATE {
 /* Inicializar el controlador PS/2 y habilitar IRQ de mouse */
 void MouseInit(void);
 
+/* Handler auxiliar llamado desde el IRQ1 del PIC. Se encarga de distinguir
+   entre byte de teclado y paquete de mouse mediante el bit de estado. */
+void ps2_irq(void);
+
 /* Actualizar el estado interno leyendo un paquete PS/2.
  * El parámetro "state" es opcional y se rellena con la copia actual.
  */

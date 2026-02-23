@@ -39,6 +39,16 @@ void GuiQueueMouseEvent(int x, int y, int buttons)
     g_mouse_queue[g_mouse_qtail].buttons = buttons;
     g_mouse_qtail = next;
 
+    /* debug: reportar evento entrante al serial */
+    {
+        extern void serial_puts(const char*);
+        extern void serial_print_hex(uint32_t);
+        serial_puts("[mouse event queued] ");
+        serial_print_hex(x); serial_puts(",");
+        serial_print_hex(y); serial_puts(",");
+        serial_print_hex(buttons); serial_puts("\r\n");
+    }
+
     /* manejar interacción básica con la barra de tareas */
     /* coordenadas del botón "Start" (2,471) tamaño 36x8 */
     if (x >= 2 && x < 2 + 36 && y >= 471 && y < 471 + 8) {
@@ -107,37 +117,57 @@ void GuiDrawTaskbar(void)
         DrawVLine(bx+bw-1,   by,       bh,   VGA_COLOR_WHITE);
     }
     VgaDrawString(bx+8, by, "Start", VGA_COLOR_BLACK, GUI_COLOR_BUTTON_BG);
-    /* reloj */
+    /* reloj: mostrar MM:SS para que el usuario vea movimiento rápido */
     uint32_t ticks = get_tick_count();
-    uint32_t secs = ticks / 100; /* asumiendo timer 100Hz */
+    uint32_t secs = ticks / 100; /* 100Hz timer */
     uint32_t mins = (secs / 60) % 60;
-    uint32_t hours = (secs / 3600) % 24;
+    uint32_t seconds = secs % 60;
     char buf[6];
-    buf[0] = '0' + (hours / 10) % 10;
-    buf[1] = '0' + (hours % 10);
+    buf[0] = '0' + (mins / 10) % 10;
+    buf[1] = '0' + (mins % 10);
     buf[2] = ':';
-    buf[3] = '0' + (mins / 10) % 10;
-    buf[4] = '0' + (mins % 10);
+    buf[3] = '0' + (seconds / 10) % 10;
+    buf[4] = '0' + (seconds % 10);
     buf[5] = '\0';
     VgaDrawString(600, y + 1, buf, VGA_COLOR_BLACK, GUI_COLOR_BUTTON_BG);
 }
 
 void GuiDrawWindow(const GUI_WINDOW* win)
 {
-    if (!win || !win->visible) return;
+    extern void serial_puts(const char*);
+    serial_puts("[kernel] GuiDrawWindow entry\n");
+    if (!win || !win->visible) {
+        serial_puts("[kernel] GuiDrawWindow skipping (null/hidden)\n");
+        return;
+    }
     int x = win->x, y = win->y, w = win->w, h = win->h;
+    /* log dimensions */
+    {
+        extern void serial_print_hex(uint32_t v);
+        serial_puts("[kernel] win: x="); serial_print_hex(x);
+        serial_puts(" y="); serial_print_hex(y);
+        serial_puts(" w="); serial_print_hex(w);
+        serial_puts(" h="); serial_print_hex(h);
+        serial_puts("\n");
+    }
+    serial_puts("[kernel] GuiDrawWindow: clearing shadow\n");
     VgaFillRect(x+3, y+3, w, h, GUI_COLOR_SHADOW);
+    serial_puts("[kernel] GuiDrawWindow: cleared shadow\n");
+    serial_puts("[kernel] GuiDrawWindow: filling window background\n");
     VgaFillRect(x, y, w, h, GUI_COLOR_WINDOW_BG);
+    serial_puts("[kernel] GuiDrawWindow: drawing titlebar\n");
     VgaFillRect(x, y, w, TITLEBAR_HEIGHT, GUI_COLOR_TITLEBAR);
     if (win->title) {
+        serial_puts("[kernel] GuiDrawWindow: drawing title text\n");
         VgaDrawString(x + 4, y + 1, win->title, GUI_COLOR_TITLEBAR_TXT, GUI_COLOR_TITLEBAR);
     }
-    /* boton cerrar fijo */
+    serial_puts("[kernel] GuiDrawWindow: drawing frame\n");
     DrawHLine(x,     y,     w,   VGA_COLOR_WHITE);
     DrawVLine(x,     y,     h,   VGA_COLOR_WHITE);
     DrawHLine(x,     y+h-1, w,   GUI_COLOR_SHADOW);
     DrawVLine(x+w-1, y,     h,   GUI_COLOR_SHADOW);
     DrawHLine(x, y + TITLEBAR_HEIGHT, w, GUI_COLOR_BORDER);
+    serial_puts("[kernel] GuiDrawWindow exit\n");
 }
 
 void GuiDrawWindowText(const GUI_WINDOW* win, int rx, int ry, const char* txt, UCHAR fg)

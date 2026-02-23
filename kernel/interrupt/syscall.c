@@ -1,11 +1,11 @@
 #include "syscall.h"
-#include "../mm/vmm.h"   /* para validación de punteros si lo necesitamos */
+#include <gui.h>           /* GUI_WINDOW, GUI_MOUSE_EVENT */
+#include "../mm/vmm.h"   /* para validación de punteros y estructuras PTE */
 #include "../proc/process.h"
 #include "../proc/scheduler.h"
 #include "../drivers/video/vga/vga.h"    /* funciones VGA */
 #include "../drivers/video/vga/vga_font.h" /* VgaDrawString */
 #include "../drivers/input/ps2mouse.h" /* MOUSE_STATE */
-#include <gui.h>           /* GUI_WINDOW, GUI_MOUSE_EVENT */
 #include "../../include/libsys.h"  /* definiciones de SYS_MOUSE, etc. */
 #include <types.h>
 
@@ -34,7 +34,19 @@ void syscall_tick_increment(void)
 /* Validación sencilla de punteros de usuario. Acepta direcciones < 0x80000000. */
 static int is_user_ptr(const void* p)
 {
-    return ((uint32_t)p < 0x80000000);
+    uint32_t addr = (uint32_t)p;
+    if (addr >= 0x80000000) return 0;
+    /* verify page table entries have U bit set; protect from kernel-only addresses */
+    uint32_t cr3;
+    __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+    /* walk two-level page tables */
+    pde_t *pde = (pde_t*)((cr3 & ~0xFFF) + ((addr >> 22) * sizeof(pde_t)));
+    if (!(*pde & PTE_PRESENT) || !(*pde & PTE_USER))
+        return 0;
+    pte_t *pte = (pte_t*)((*pde & ~0xFFF) + (((addr >> 12) & 0x3FF) * sizeof(pte_t)));
+    if (!(*pte & PTE_PRESENT) || !(*pte & PTE_USER))
+        return 0;
+    return 1;
 }
 
 /* Copia bytes de un buffer de usuario a kernel; retorna 0 en éxito, -1 en fallo. */
@@ -213,6 +225,10 @@ uint32_t syscall_dispatch(uint32_t num, uint32_t a, uint32_t b,
     }
     case SYS_GET_TICK:
         ret = get_tick_count();
+        /* debug: imprimir el valor retornado para verificar progreso */
+        serial_puts("[sys_get_tick] ");
+        serial_print_hex(ret);
+        serial_puts("\r\n");
         break;
     case SYS_GET_MOUSE_STATE: {
         /* b = pointer to SYS_MOUSE */
@@ -243,6 +259,11 @@ uint32_t syscall_dispatch(uint32_t num, uint32_t a, uint32_t b,
             ret = (uint32_t)-1; /* no event */
             break;
         }
+        /* debug: log event retrieved */
+        serial_puts("[sys_get_mouse_event] x="); serial_print_hex(evt.x);
+        serial_puts(" y="); serial_print_hex(evt.y);
+        serial_puts(" btn="); serial_print_hex(evt.buttons);
+        serial_puts("\r\n");
         if (!is_user_ptr((const void*)b)) { ret = (uint32_t)-1; break; }
         if (copy_from_user((void*)b, &evt, sizeof(evt)) != 0) {
             ret = (uint32_t)-1;
@@ -290,13 +311,15 @@ uint32_t syscall_dispatch(uint32_t num, uint32_t a, uint32_t b,
         break;
     }
     case SYS_GUI_DRAW_WINDOW: {
-        /* b = pointer to GUI_WINDOW */
-        if (!is_user_ptr((const void*)b)) { ret = (uint32_t)-1; break; }
-        GUI_WINDOW win;
-        if (copy_from_user(&win, (const void*)b, sizeof(win)) != 0) {
-            ret = (uint32_t)-1; break;
-        }
+        /* a=x, b=y, c=w, d=h, e=pointer to title */
+        int x = (int)a;
+        int y = (int)b;
+        int w = (int)c;
+        int h = (int)d;
+        const char *title = (const char*)e;
+        if (title && !is_user_ptr(title)) { ret = (uint32_t)-1; break; }
         extern void GuiDrawWindow(const GUI_WINDOW*);
+        GUI_WINDOW win = { x, y, w, h, title, 1 };
         GuiDrawWindow(&win);
         ret = 0;
         break;
