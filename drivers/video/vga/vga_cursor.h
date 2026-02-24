@@ -21,6 +21,9 @@ void CursorInit(void);
 /* Dibujar cursor en la posición indicada. Guarda el contenido previo. */
 void CursorDraw(int32_t x, int32_t y);
 
+/* toggle invert state for simple animation */
+void CursorToggleInvert(void);
+
 /* Borrar cursor previamente dibujado en la posición especificada. */
 void CursorErase(int32_t x, int32_t y);
 

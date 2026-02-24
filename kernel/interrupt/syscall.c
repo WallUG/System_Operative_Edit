@@ -251,161 +251,98 @@ uint32_t syscall_dispatch(uint32_t num, uint32_t a, uint32_t b,
             ret = 0;
         break;
     }
-    case SYS_GET_MOUSE_EVENT: {
-        /* pop next event from GUI queue */
-        GUI_MOUSE_EVENT evt;
-        extern int GuiGetMouseEvent(GUI_MOUSE_EVENT*);
-        if (GuiGetMouseEvent(&evt) != 0) {
-            ret = (uint32_t)-1; /* no event */
+    case SYS_DEBUG: {
+        /* b = pointer a cadena usuario */
+        if (!is_user_ptr((const void*)b)) {
+            serial_puts("[debug] user ptr invalid\r\n");
+            ret = (uint32_t)-1;
             break;
         }
-        /* debug: log event retrieved */
-        serial_puts("[sys_get_mouse_event] x="); serial_print_hex(evt.x);
-        serial_puts(" y="); serial_print_hex(evt.y);
-        serial_puts(" btn="); serial_print_hex(evt.buttons);
-        serial_puts("\r\n");
+        /* simple copia y enviar a serial */
+        char buf[128];
+        int i;
+        for (i = 0; i < (int)sizeof(buf)-1; i++) {
+            char ch;
+            if (copy_from_user(&ch, (const void*)(b + i), 1) != 0) {
+                serial_puts("[debug] copy_from_user failed\r\n");
+                ret = (uint32_t)-1;
+                break;
+            }
+            buf[i] = ch;
+            if (ch == '\0') break;
+        }
+        if (i == (int)sizeof(buf)-1) {
+            /* unterminated? ensure null */
+            buf[sizeof(buf)-1] = '\0';
+        }
+        serial_puts(buf);
+        ret = 0;
+        break;
+    }
+    case SYS_GET_MOUSE_EVENT: {
+        /* b = pointer to SYS_MOUSE (user buffer) */
         if (!is_user_ptr((const void*)b)) { ret = (uint32_t)-1; break; }
-        if (copy_from_user((void*)b, &evt, sizeof(evt)) != 0) {
-            ret = (uint32_t)-1;
+        GUI_MOUSE_EVENT ev;
+        int status = GuiGetMouseEvent(&ev);
+        if (status == 0) {
+            SYS_MOUSE ms = { ev.x, ev.y, ev.buttons };
+            if (copy_from_user((void*)b, &ms, sizeof(ms)) != 0)
+                ret = (uint32_t)-1;
+            else
+                ret = 0;
         } else {
-            ret = 0;
+            /* cola vacía */
+            ret = (uint32_t)-1;
         }
         break;
     }
-    case SYS_SET_CURSOR_POS: {
-        /* a=x, b=y */
-        extern void CursorErase(int32_t, int32_t);
-        extern void CursorDraw(int32_t, int32_t);
-        static int prevx = -1, prevy = -1;
-        if (prevx >= 0 && prevy >= 0) {
-            CursorErase(prevx, prevy);
-        }
-        CursorDraw((int)a, (int)b);
-        prevx = (int)a; prevy = (int)b;
-        ret = 0;
-        break;
-    }
-    case SYS_HIDE_CURSOR: {
-        extern void CursorErase(int32_t, int32_t);
-        /* simply erase at last known position */
-        static int lastx = -1, lasty = -1;
-        if (lastx >= 0 && lasty >= 0) CursorErase(lastx, lasty);
-        ret = 0;
-        break;
-    }
-    case SYS_SHOW_CURSOR: {
-        /* nothing special, cursor will be drawn on next move */
-        ret = 0;
-        break;
-    }
-    case SYS_GUI_DRAW_DESKTOP: {
-        extern void GuiDrawDesktop(void);
+    case SYS_GUI_DRAW_DESKTOP:
         GuiDrawDesktop();
         ret = 0;
         break;
-    }
-    case SYS_GUI_DRAW_TASKBAR: {
-        extern void GuiDrawTaskbar(void);
+    case SYS_GUI_DRAW_TASKBAR:
         GuiDrawTaskbar();
         ret = 0;
         break;
-    }
     case SYS_GUI_DRAW_WINDOW: {
-        /* a=x, b=y, c=w, d=h, e=pointer to title */
-        int x = (int)a;
-        int y = (int)b;
-        int w = (int)c;
-        int h = (int)d;
-        const char *title = (const char*)e;
-        if (title && !is_user_ptr(title)) { ret = (uint32_t)-1; break; }
-        extern void GuiDrawWindow(const GUI_WINDOW*);
-        GUI_WINDOW win = { x, y, w, h, title, 1 };
+        /* argumentos: a=x, b=y, c=w, d=h, e=pointer title */
+        if (!is_user_ptr((const void*)e)) { ret = (uint32_t)-1; break; }
+        char title[128];
+        for (int i = 0; i < (int)sizeof(title)-1; i++) {
+            char ch;
+            if (copy_from_user(&ch, (const void*)(e + i), 1) != 0) { ret = (uint32_t)-1; break; }
+            title[i] = ch;
+            if (ch == '\0') break;
+        }
+        title[127] = '\0';
+        GUI_WINDOW win = { (INT)a, (INT)b, (INT)c, (INT)d, title, 1 };
         GuiDrawWindow(&win);
         ret = 0;
         break;
     }
     case SYS_GUI_DRAW_WINDOW_TEXT: {
-        /* a = pointer to GUI_WINDOW, b=rx, c=ry, d=pointer to string, e=fg */
-        GUI_WINDOW win;
+        /* a=pointer win (user), b=rx, c=ry, d=pointer txt, e=fg */
         if (!is_user_ptr((const void*)a) || !is_user_ptr((const void*)d)) { ret = (uint32_t)-1; break; }
-        if (copy_from_user(&win, (const void*)a, sizeof(win)) != 0) { ret = (uint32_t)-1; break; }
-        /* copy string to local buffer */
-        char buf[128];
-        int i;
-        const char *src = (const char*)d;
-        for (i = 0; i < (int)sizeof(buf)-1; i++) {
-            if (!is_user_ptr(src + i)) { ret = (uint32_t)-1; break; }
-            buf[i] = src[i];
-            if (buf[i] == '\0') break;
+        GUI_WINDOW localWin;
+        if (copy_from_user(&localWin, (const void*)a, sizeof(localWin)) != 0) { ret = (uint32_t)-1; break; }
+        char txt[128];
+        for (int i = 0; i < (int)sizeof(txt)-1; i++) {
+            char ch;
+            if (copy_from_user(&ch, (const void*)(d + i), 1) != 0) { ret = (uint32_t)-1; break; }
+            txt[i] = ch;
+            if (ch == '\0') break;
         }
-        if (ret != 0) break;
-        buf[sizeof(buf)-1] = '\0';
-        extern void GuiDrawWindowText(const GUI_WINDOW*, int, int, const char*, UCHAR);
-        GuiDrawWindowText(&win, (int)b, (int)c, buf, (UCHAR)e);
+        txt[127] = '\0';
+        GuiDrawWindowText(&localWin, (INT)b, (INT)c, txt, (UCHAR)e);
         ret = 0;
         break;
     }
-    case SYS_GET_PIXEL:
-        /* a=x b=y */
-        ret = VgaGetPixel((INT)a, (INT)b);
-        break;
-    case SYS_DEBUG: {
-        /* a = pointer to nul-terminated string */
-        serial_puts("[debug syscall]\r\n");
-        if (!is_user_ptr((const void*)a)) { ret = (uint32_t)-1; break; }
-        /* copiar max 128 bytes para evitar overflow */
-        char buf[128];
-        if (copy_from_user(buf, (const void*)a, sizeof(buf)-1) != 0) {
-            ret = (uint32_t)-1;
-            break;
-        }
-        buf[sizeof(buf)-1] = '\0';
-        serial_puts(buf);
-        ret = 0;
-        break;
-    }
-    case SYS_DUMP_VRAM: {
-        serial_puts("[dump syscall]\r\n");
-        /* read each of the four planes separately by setting Read Map Select */
-        for (int p = 0; p < 4; p++) {
-            /* select read plane p */
-            VgaWriteGraphicsController(4, (UCHAR)p);
-            char linebuf[160];
-            for (int row = 0; row < 16; row++) {
-                /* prefix plane and row */
-                serial_puts("pl");
-                char digit = '0' + p;
-                serial_puts((const char[]){digit,' ',0});
-                serial_puts("row ");
-                serial_print_hex(row);
-                serial_puts(": ");
-                PUCHAR fb = (PUCHAR)VGA_BASE_ADDRESS;
-                for (int col = 0; col < 16; col++) {
-                    UCHAR b = fb[row * (640/8) + col];
-                    char h[3];
-                    static const char *hex="0123456789ABCDEF";
-                    h[0] = hex[(b>>4)&0xF]; h[1] = hex[b&0xF]; h[2]='\0';
-                    serial_puts(h);
-                    serial_puts(" ");
-                }
-                serial_puts("\r\n");
-            }
-        }
-        /* restore read map to plane 0 for sanity */
-        VgaWriteGraphicsController(4, 0x00);
-        /* also dump first 8 entries of shadow row 0 */
-        {
-            serial_puts("[shadow row0]: ");
-            static const char *hex="0123456789ABCDEF";
-            for (int i = 0; i < 8; i++) {
-                UCHAR c = VgaGetPixel(i, 0);
-                char h[3];
-                h[0] = hex[(c>>4)&0xF]; h[1] = hex[c&0xF]; h[2]='\0';
-                serial_puts(h);
-                serial_puts(" ");
-            }
-            serial_puts("\r\n");
-        }
+    case SYS_GUI_DRAW_BUTTON: {
+        /* a=x,b=y,c=w,d=h,e=pressed,label in esi?? not handled here */
+        /* For simplicity we ignore label and pressed state from params and assume
+           the user will only draw buttons via taskbar helper, so we just call
+           GuiDrawButton using registers directly. */
+        GuiDrawButton((INT)a, (INT)b, (INT)c, (INT)d, NULL, (INT)e);
         ret = 0;
         break;
     }

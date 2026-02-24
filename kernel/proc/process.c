@@ -248,15 +248,16 @@ process_t* proc_create_user(const char* name,
     extern void screen_writeln(const char*);
     extern void screen_write(const char*);
     extern void serial_puts(const char*);
-    /* debug: dump start/address/size as hex (buf removed) */
+    /* debug: dump start/address/size as hex (also send digits to serial) */
     screen_write("user start=0x");
     serial_puts("user start=0x");
-    /* simple hexdump without printf */
     {
         uint32_t v = code_phys;
         for (int i = 28; i >= 0; i -= 4) {
             char c = "0123456789ABCDEF"[(v >> i) & 0xF];
-            char s[2] = {c,0}; screen_write(s);
+            char s[2] = {c,0};
+            screen_write(s);
+            serial_puts(s);
         }
         screen_writeln("");
         serial_puts("\r\n");
@@ -267,7 +268,9 @@ process_t* proc_create_user(const char* name,
         uint32_t v = entry_virt;
         for (int i = 28; i >= 0; i -= 4) {
             char c = "0123456789ABCDEF"[(v >> i) & 0xF];
-            char s[2] = {c,0}; screen_write(s);
+            char s[2] = {c,0};
+            screen_write(s);
+            serial_puts(s);
         }
         screen_writeln("");
         serial_puts("\r\n");
@@ -278,9 +281,12 @@ process_t* proc_create_user(const char* name,
         uint32_t v = code_size;
         for (int i = 28; i >= 0; i -= 4) {
             char c = "0123456789ABCDEF"[(v >> i) & 0xF];
-            char s[2] = {c,0}; screen_write(s);
+            char s[2] = {c,0};
+            screen_write(s);
+            serial_puts(s);
         }
         screen_writeln("");
+        serial_puts("\r\n");
     }
 
     process_t* proc = alloc_process();

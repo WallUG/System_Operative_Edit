@@ -37,6 +37,7 @@ extern NTSTATUS IoCreateDriver(PUNICODE_STRING, PDRIVER_INITIALIZE);
 extern NTSTATUS VgaDriverEntry(void*, PUNICODE_STRING);
 extern NTSTATUS HalInitializeDisplay(void);
 extern void VgaDrawDemo(void);
+extern void GuiMainLoop(void);
 /* GuiMainLoop ahora corre en espacio de usuario */
 /* extern void MouseInit(void);  moved to ps2mouse.h */
 
@@ -273,21 +274,17 @@ void kernel_main(uint32_t magic, multiboot_info_t* mbi)
     }
     serial_puts("\r\n");
 
-    /* gui_server como proceso de usuario Ring 3 */
-    {
-        serial_puts("[boot] creating gui_server\r\n");
-        extern uint8_t _user_start[];
-        extern uint8_t _user_end[];
-        extern void user_entry(void);
+    /* gui_server como kernel thread Ring 0 */
+    proc_create_kernel("gui_server", GuiMainLoop);
 
-        uint32_t code_phys = (uint32_t)_user_start;
-        uint32_t code_size = (uint32_t)(_user_end - _user_start);
-        if (!proc_create_user("gui_server", code_phys, code_size,
-                              (uint32_t)user_entry)) {
-            kernel_panic("Failed to create GUI user process");
-        }
-    }
-	
+    /* crear proceso de usuario Ring 3 para el servidor GUI (gui_user.c) */
+    extern uint8_t _user_start, _user_end;   /* definidos en linker.ld */
+    extern void user_entry(void);
+    proc_create_user("gui_user",
+                     (uint32_t)&_user_start,
+                     (uint32_t)(&_user_end - &_user_start),
+                     (uint32_t)user_entry);
+
     /* Inicializar el scheduler.
      * proc_create_kernel() ya llamo scheduler_add_thread() internamente
      * para el thread del gui_server. El idle lo anade scheduler_init(). */

@@ -54,5 +54,8 @@ void GuiDrawDesktop(void);
 void GuiDrawTaskbar(void);
 void GuiDrawWindow(const GUI_WINDOW* win);
 void GuiDrawWindowText(const GUI_WINDOW* win, int rx, int ry, const char* txt, UCHAR fg);
-
+/* otros elementos gráficos útiles */
+void GuiDrawButton(int x, int y, int w, int h, const char* label, int pressed);
+void GuiDrawHLine(int x, int y, int len, UCHAR color);
+void GuiDrawVLine(int x, int y, int len, UCHAR color);
 #endif /* _GUI_H */

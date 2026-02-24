@@ -1,0 +1,2371 @@
+[boot] serial init
+[VGA] VgaSetMode called
+[VGA] switching to graphics mode
+[VGA] graphics mode set
+[VGA] buffer @A0000: 3D  3D  3D  3D  3D  3D  3D  3D  3D  3D  3D  3D  3D  3D  3D  3D 
+[VGA] buffer @B8000: FF  FF  FF  FF  FF  FF  FF  FF  FF  FF  FF  FF  FF  FF  FF  FF 
+user start=0x0015D000
+entry=0x0015D000
+size=0x0000215B
+[boot] scheduler init
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+SYS:09(0x0015F144,0x00000000)
+Sÿ0x00000005 0x0015D025 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:16(0x0015F0F8,0x000003FD)
+0x00000005 0x0015D02F 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:15(0x0015F0F8,0x000003FD)
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+0x00000005 0x0015D036 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:16(0x0015F0E8,0x000003FD)
+0x00000005 0x0015D040 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:16(0x0015F0D0,0x000003FD)
+0x00000005 0x0015D04A 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:16(0x0015F0D0,0x000003FD)
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+0x00000005 0x0015D051 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:16(0x0015F0C0,0x000003FD)
+0x00000005 0x0015D05B 0x0000001B 0x00000202 0x7FFEFF70 
+SYS:09(0x0015F0B0,0x00000020)
+¥þ0x00000005 0x0015D0A3 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:09(0x7FFEFFAC,0x000003FD)
+ÿ0x00000005 0x0015D0B1 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:09(0x0015F0AB,0x000003FD)
+ÿ0x00000005 0x0015D0BE 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:09(0x0015F08C,0x000003FD)
+ÿ0x00000005 0x0015D0CB 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:17(0x00000096,0x00000050)
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+0x00000005 0x0015D0F4 0x0000001B 0x00000246 0x7FFEFF70 
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+SYS:09(0x0015F07C,0x000003FD)
+ÿ0x00000005 0x0015D105 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:09(0x0015F060,0x000003FD)
+ÿ0x00000005 0x0015D112 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:18(0x0015E000,0x0000000A)
+0x00000005 0x0015D12E 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:18(0x0015E000,0x000003FD)
+0x00000005 0x0015D149 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:09(0x0015F000,0x000003FD)
+ÿ0x00000005 0x0015D15A 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:16(0x0015F000,0x000003FD)
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+0x00000005 0x0015D161 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000246 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[tick]
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[tick]
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[tick]
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[tick]
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[tick]
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] Vg[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+aFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[tick]
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] V[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+gaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFill[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+Rect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[tick]
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect [sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+[tick]
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow d[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+one
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware don[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+e
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFil[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+lRect hardware done
+[tick]
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[tick]
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+ done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[tick]
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFil[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+lRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect sh[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+adow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[tick]
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread
+[sched] found next thread
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[vga] VgaFillRect start
+[vga] VgaFillRect shadow done
+[vga] VgaFillRect hardware done
+[sched] found next thread
+0x00000005 0x0015D326 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:11(0x7FFEFF94,0x000003FD)
+0x00000005 0x0015D1BB 0x0000001B 0x00000206 0x7FFEFF70 
+SYS:01(0x7FFEFF94,0x000003FD)
+[sched] found next thread

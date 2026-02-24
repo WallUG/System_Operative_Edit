@@ -93,43 +93,21 @@ void user_entry(void)
 
     /* ya no manejamos cursor manualmente, el kernel se ocupa */
 
-    uint32_t last_secs = 0;
+    /* dibujamos taskbar una sola vez al arrancar; el kernel se encargará
+       de actualizar el reloj por su cuenta. */
+    sys_gui_draw_taskbar();
     int start_pressed = 0;
     while (1) {
-        /* actualizar reloj cada segundo */
-        uint32_t ticks = sys_get_tick();
-        uint32_t secs = ticks / 100;
-        if (secs != last_secs) {
-            /* debug: mostrar número de ticks y segundos obtenidos */
-            {
-                char buf[32];
-                int n = 0;
-                uint32_t tmp = ticks;
-                /* simple decimal conversion */
-                if (tmp == 0) buf[n++] = '0';
-                else {
-                    char dec[12]; int di = 0;
-                    while (tmp) { dec[di++] = '0' + (tmp % 10); tmp /= 10; }
-                    while (di--) buf[n++] = dec[di];
-                }
-                buf[n++] = ' '; buf[n++] = 't'; buf[n++] = 'i'; buf[n++] = 'c'; buf[n++] = 'k';
-                buf[n++] = '\r'; buf[n++] = '\n'; buf[n] = '\0';
-                sys_debug(buf);
-            }
-            sys_gui_draw_taskbar();
-            last_secs = secs;
-        }
+        /* el reloj ya está pintado por kernel, simplemente procesamos eventos */
 
         /* procesar eventos de mouse */
         if (sys_get_mouse_event(&ms) == 0) {
-            /* debug: log mouse event */
+            /* log event en serial para inspección */
             {
-                /* convertir números a decimal manualmente */
                 char buf[64];
                 int n = 0;
                 buf[n++] = '['; buf[n++] = 'u'; buf[n++] = 's'; buf[n++] = 'e'; buf[n++] = 'r'; buf[n++] = ' ';
                 buf[n++] = 'e'; buf[n++] = 'v'; buf[n++] = 'e'; buf[n++] = 'n'; buf[n++] = 't'; buf[n++] = ']'; buf[n++] = ' ';
-                /* x value */
                 int v = ms.x;
                 if (v < 0) { buf[n++] = '-'; v = -v; }
                 {
@@ -162,7 +140,7 @@ void user_entry(void)
                 buf[n] = '\0';
                 sys_debug(buf);
             }
-            /* detectar clic en "Start" */
+            /* clic izquierdo / derecho básicos */
             if ((ms.buttons & 1) && !start_pressed &&
                 ms.x >= 2 && ms.x < 38 && ms.y >= 471 && ms.y < 471+8) {
                 start_pressed = 1;
@@ -170,6 +148,12 @@ void user_entry(void)
             } else if (!(ms.buttons & 1) && start_pressed) {
                 start_pressed = 0;
                 sys_gui_draw_taskbar();
+            }
+            if (ms.buttons & 1) {
+                sys_debug("[user] left click\r\n");
+            }
+            if (ms.buttons & 2) {
+                sys_debug("[user] right click\r\n");
             }
         }
 

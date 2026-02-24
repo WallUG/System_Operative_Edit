@@ -28,6 +28,12 @@ void CursorInit(void) {
     g_cursor_saved_y = -1;
 }
 
+static int g_cursor_invert = 0;
+
+void CursorToggleInvert(void) {
+    g_cursor_invert = !g_cursor_invert;
+}
+
 void CursorDraw(int32_t x, int32_t y) {
     int row, col;
     /* guardar fondo real */
@@ -44,8 +50,11 @@ void CursorDraw(int32_t x, int32_t y) {
     for (row = 0; row < CURSOR_HEIGHT; row++) {
         for (col = 0; col < CURSOR_WIDTH; col++) {
             unsigned char pixel = cursor_bitmap[row][col];
-            if      (pixel == 1) VgaPutPixel(x + col, y + row, VGA_COLOR_WHITE);
-            else if (pixel == 2) VgaPutPixel(x + col, y + row, VGA_COLOR_BLACK);
+            if (pixel == 1) {
+                VgaPutPixel(x + col, y + row, g_cursor_invert ? VGA_COLOR_BLACK : VGA_COLOR_WHITE);
+            } else if (pixel == 2) {
+                VgaPutPixel(x + col, y + row, g_cursor_invert ? VGA_COLOR_WHITE : VGA_COLOR_BLACK);
+            }
         }
     }
 }
@@ -53,6 +62,8 @@ void CursorDraw(int32_t x, int32_t y) {
 void CursorErase(int32_t x, int32_t y) {
     int row, col;
     if (x < 0 || y < 0) return;
+    /* no restauramos si está dentro de la barra de tareas */
+    if (y >= 470) return;
     for (row = 0; row < CURSOR_HEIGHT; row++) {
         for (col = 0; col < CURSOR_WIDTH; col++) {
             UCHAR bg = g_cursor_bg[row * CURSOR_WIDTH + col];

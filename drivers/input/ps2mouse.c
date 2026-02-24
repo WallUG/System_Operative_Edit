@@ -7,8 +7,6 @@
  */
 
 #include "ps2mouse.h"
-#include <gui.h>              /* eventos y estructuras compartidas */
-#include "../video/vga/vga_cursor.h" /* dibujo de cursor en kernel */
 
 /* I/O port helpers ------------------------------------------------------- */
 static inline void outb(uint16_t port, uint8_t val) {
@@ -50,34 +48,8 @@ static uint8_t mouse_read(void) {
 /* Estado global del ratón */
 static MOUSE_STATE g_mouse = { 320, 240, 0, 1 };
 
-
-/* helper invocado desde el handler de IRQ1 para despachar teclado o mouse
-   según el bit 5 del registro de estado PS/2 (0=teclado, 1=mouse). */
-void ps2_irq(void)
-{
-    uint8_t status = inb(0x64);
-    /* debug: reportar IRQ PS/2 y bit de origen */
-    {
-        extern void serial_puts(const char*);
-        extern void serial_print_hex(uint32_t);
-        serial_puts("[ps2 irq] status=");
-        serial_print_hex(status);
-        serial_puts("\r\n");
-    }
-    if (status & 0x20) {
-        /* paquete de mouse disponible */
-        MouseRead(NULL);
-    } else {
-        /* scancode de teclado; ignoramos por ahora pero debemos consumirlo */
-        (void)inb(0x60);
-    }
-}
-
 void MouseInit(void) {
     uint8_t status;
-
-    /* Inicializar cursor del subsistema GUI */
-    GuiInit();
 
     /* Desenmascarar IRQ1 (teclado/PS2) en el PIC master. */
     {
@@ -117,11 +89,6 @@ void MouseInit(void) {
     g_mouse.y = 240;
     g_mouse.buttons = 0;
     g_mouse.visible = 1;
-    /* dibujar cursor inicial para que el usuario lo vea aun sin eventos */
-    {
-        extern void CursorDraw(int32_t, int32_t);
-        CursorDraw(g_mouse.x, g_mouse.y);
-    }
 }
 
 void MouseRead(MOUSE_STATE* state) {
@@ -145,20 +112,6 @@ void MouseRead(MOUSE_STATE* state) {
     if (g_mouse.y > 468) g_mouse.y = 468;
 
     g_mouse.buttons = flags & 0x07;
-
-    /* actualizar cursor en pantalla (kernel) */
-    static int prev_x = -1, prev_y = -1;
-    if (g_mouse.visible) {
-        if (prev_x >= 0 && prev_y >= 0) {
-            CursorErase(prev_x, prev_y);
-        }
-        CursorDraw(g_mouse.x, g_mouse.y);
-        prev_x = g_mouse.x;
-        prev_y = g_mouse.y;
-    }
-
-    /* encolar evento para procesos usuario */
-    GuiQueueMouseEvent(g_mouse.x, g_mouse.y, g_mouse.buttons);
 
     if (state) *state = g_mouse;
 }

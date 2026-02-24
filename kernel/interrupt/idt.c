@@ -413,17 +413,15 @@ __asm__(
 
 /* IRQ1 - Teclado PS/2: leer el scancode del buffer (limpia el buffer del
  * controlador PS/2) y enviar EOI. Sin esto el controlador bloquea el bus. */
-/* forward into C code to handle PS/2 keyboard/mouse multiplexing */
-extern void ps2_irq(void);
+/* IRQ1 handler simply reads scancode to clear PS/2 buffer */
 
 void irq1_keyboard_handler(void);
 __asm__(
     ".global irq1_keyboard_handler\n"
     "irq1_keyboard_handler:\n"
     "  pusha\n"
-    /* call into C helper which will inspect the PS/2 status byte and
-       dispatch either keyboard scancode or mouse packet accordingly */
-    "  call ps2_irq\n"
+    /* leer scancode para vaciar buffer */
+    "  inb  $0x60, %al\n"
     "  movb $0x20, %al\n"
     "  outb %al, $0x20\n"       /* EOI */
     "  popa\n"
