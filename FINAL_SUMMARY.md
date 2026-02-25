@@ -360,7 +360,7 @@ Uses VGA DAC (Digital-to-Analog Converter) for smooth fading:
 - [ ] VESA VBE support (higher resolutions)
 - [ ] True color support (16/24-bit)
 - [ ] Animated logo (multiple frames)
-- [ ] PC Speaker boot sound
+- [x] PC Speaker boot sound (initial GUI startup beeps)
 - [ ] Theme system
 
 ---

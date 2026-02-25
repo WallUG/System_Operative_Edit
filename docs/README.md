@@ -12,13 +12,11 @@ Este directorio contiene toda la documentación del proyecto.
    - Flujo de arranque
    - Interacción entre componentes
    - **Detalle reciente:** Interfaz de llamadas al sistema y ejecución de GUI en
-     Ring 3, con corrección de errores en el stub de syscall (evitar sobrescribir
-     argumentos).
-
-2. **[Roadmap de Desarrollo](roadmap.md)**
-   - Plan de desarrollo por fases
-   - Características planificadas
-   - Cronograma estimado
+       Ring 3, con corrección de errores en el stub de syscall (evitar sobrescribir
+       argumentos).
+     - **Novedades:** Consola gráfica interactiva accesible con F1 y sonido de
+       arranque a través del PC speaker (señalización / diagnóstico visual y
+       auditivo al iniciar la GUI).
    - Prioridades
 
 ### Documentación por Componentes

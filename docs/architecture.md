@@ -213,7 +213,9 @@ ofrece primitivas de alto nivel a través de llamadas al sistema. El servicio:
   `SYS_GET_MOUSE_EVENT`), permitiendo a las aplicaciones leer movimientos y
   clics sin subir constantes del estado del dispositivo.
 - Contiene lógica de interacción básica (por ejemplo, detección de clic en el
-  botón "Start" y un pequeño "consola" emergente).
+  botón "Start" y un pequeño "consola" emergente que puede activarse con F1).
+  La consola ahora es interactiva: captura teclas, acepta comandos `help` y
+  `clear`, y despliega resultados dentro de una ventana gráfica.
 
 El servidor GUI en Ring 3 (`user/gui_user.c`) usa estas llamadas de manera
 ligera, lo que mejora el rendimiento, separa capas de responsabilidad y

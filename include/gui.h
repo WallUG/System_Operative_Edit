@@ -58,4 +58,11 @@ void GuiDrawWindowText(const GUI_WINDOW* win, int rx, int ry, const char* txt, U
 void GuiDrawButton(int x, int y, int w, int h, const char* label, int pressed);
 void GuiDrawHLine(int x, int y, int len, UCHAR color);
 void GuiDrawVLine(int x, int y, int len, UCHAR color);
+
+/* soporte de teclado / consola integrada */
+/* el IRQ1 llama a GuiKeyboardHandler() con el scancode recibido;
+   la rutina traduce a ASCII y mantiene un buffer para la consola.
+   se expone aquí sólo para que el manejador en idt.c pueda declararlo. */
+void GuiKeyboardHandler(uint8_t sc);
+
 #endif /* _GUI_H */

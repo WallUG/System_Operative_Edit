@@ -2,9 +2,284 @@
  * vga_gui.c - Implementacion de la GUI tipo Windows
  */
 #include <gui.h>          /* GUI_WINDOW, GUI_MOUSE_EVENT, prototypes */
+/* minimal string helpers defined manually; no standard library available */
+
 #include "vga_cursor.h"
 #include "../../input/ps2mouse.h"
 #include "vga_font.h"      /* VgaDrawString prototype */
+
+/* tick counter defined in syscall.c (used by speaker/beep function) */
+extern uint32_t get_tick_count(void);
+
+/* ---------------------------------------------------------------------
+   teclado + consola integrada
+   --------------------------------------------------------------------- */
+
+/* simple string routines used by console */
+static int kg_strcmp(const char *a, const char *b) {
+    while (*a && *a == *b) { a++; b++; }
+    return (unsigned char)*a - (unsigned char)*b;
+}
+static size_t kg_strlen(const char *s) {
+    size_t i = 0;
+    while (s[i]) i++;
+    return i;
+}
+static void kg_strncpy(char *dst, const char *src, size_t n) {
+    size_t i;
+    for (i = 0; i < n && src[i]; i++) dst[i] = src[i];
+    for (; i < n; i++) dst[i] = '\0';
+}
+static void kg_strncat(char *dst, const char *src, size_t max) {
+    size_t len = kg_strlen(dst);
+    size_t i = 0;
+    while (len + i + 1 < max && src[i]) {
+        dst[len + i] = src[i];
+        i++;
+    }
+    if (len + i < max) dst[len + i] = '\0';
+}
+
+/* scancode -> character (set 1) mapping; ninguno de los caracteres
+   requiere modificación con shift (se ignoran mayúsculas por simplicidad)
+   F1 se convierte en código especial 0xF1 para alternar la consola. */
+static const unsigned char scancode_to_ascii[128] = {
+    [0x02] = '1', [0x03] = '2', [0x04] = '3', [0x05] = '4',
+    [0x06] = '5', [0x07] = '6', [0x08] = '7', [0x09] = '8',
+    [0x0A] = '9', [0x0B] = '0',
+    [0x10] = 'q', [0x11] = 'w', [0x12] = 'e', [0x13] = 'r',
+    [0x14] = 't', [0x15] = 'y', [0x16] = 'u', [0x17] = 'i',
+    [0x18] = 'o', [0x19] = 'p',
+    [0x1E] = 'a', [0x1F] = 's', [0x20] = 'd', [0x21] = 'f',
+    [0x22] = 'g', [0x23] = 'h', [0x24] = 'j', [0x25] = 'k',
+    [0x26] = 'l',
+    [0x2C] = 'z', [0x2D] = 'x', [0x2E] = 'c', [0x2F] = 'v',
+    [0x30] = 'b', [0x31] = 'n', [0x32] = 'm',
+    [0x39] = ' ', /* espacio */
+    [0x1C] = '\n', /* enter */
+    [0x0E] = 0x08, /* backspace */
+    [0x3B] = 0xF1, /* F1 toggle */
+};
+
+#define KBD_BUF_SIZE 128
+static char kbd_buf[KBD_BUF_SIZE];
+static int kbd_head = 0, kbd_tail = 0;
+
+static void kbd_put(char c)
+{
+    int next = (kbd_head + 1) % KBD_BUF_SIZE;
+    if (next == kbd_tail) {
+        /* buffer lleno, descartar */
+        return;
+    }
+    kbd_buf[kbd_head] = c;
+    kbd_head = next;
+}
+
+/* retorna -1 si no hay caracteres */
+static int kbd_getchar(void)
+{
+    if (kbd_head == kbd_tail) return -1;
+    int c = (unsigned char)kbd_buf[kbd_tail];
+    kbd_tail = (kbd_tail + 1) % KBD_BUF_SIZE;
+    return c;
+}
+
+/* Invocado desde el manejador de IRQ1 en idt.c */
+void GuiKeyboardHandler(uint8_t sc)
+{
+    /* ignorar releases (bit7 set) */
+    if (sc & 0x80) return;
+    if (sc < sizeof(scancode_to_ascii) && scancode_to_ascii[sc]) {
+        kbd_put(scancode_to_ascii[sc]);
+    }
+}
+
+/* ---------------------------------------------------------------------
+   consola gráfica simple
+   --------------------------------------------------------------------- */
+
+#define CONS_COLS 70
+#define CONS_ROWS 12
+static char cons_history[CONS_ROWS][CONS_COLS+1];
+static int cons_history_start = 0;
+static int cons_history_count = 0;
+static char cons_input[CONS_COLS+1];
+static int cons_input_pos = 0;
+static int console_active = 0;
+
+static GUI_WINDOW console_win = { 10, 10, 620, 200, "Console", 0 };
+
+static void ConsoleRedraw(void);
+
+static void ConsoleClear(void)
+{
+    for (int i = 0; i < CONS_ROWS; i++)
+        cons_history[i][0] = '\0';
+    cons_history_start = cons_history_count = 0;
+    cons_input_pos = 0;
+    cons_input[0] = '\0';
+    ConsoleRedraw();
+}
+
+static void ConsoleAddLine(const char *line)
+{
+    int idx;
+    if (cons_history_count < CONS_ROWS) {
+        idx = (cons_history_start + cons_history_count) % CONS_ROWS;
+        cons_history_count++;
+    } else {
+        /* desplazar (sobrescribir la línea más antigua) */
+        idx = cons_history_start;
+        cons_history_start = (cons_history_start + 1) % CONS_ROWS;
+    }
+    kg_strncpy(cons_history[idx], line, CONS_COLS);
+    cons_history[idx][CONS_COLS] = '\0';
+    ConsoleRedraw();
+}
+
+static void ConsolePrint(const char *s)
+{
+    /* imprime cadena con saltos de línea automáticamente */
+    const char *p = s;
+    char buf[CONS_COLS+1];
+    int bi = 0;
+    while (*p) {
+        if (*p == '\n') {
+            buf[bi] = '\0';
+            ConsoleAddLine(buf);
+            bi = 0;
+        } else {
+            if (bi < CONS_COLS - 1)
+                buf[bi++] = *p;
+        }
+        p++;
+    }
+    if (bi > 0) {
+        buf[bi] = '\0';
+        ConsoleAddLine(buf);
+    }
+}
+
+static void console_execute(const char *cmd)
+{
+    if (kg_strcmp(cmd, "help") == 0) {
+        ConsolePrint("help - lista de comandos\n");
+        ConsolePrint("clear - limpiar pantalla\n");
+    } else if (kg_strcmp(cmd, "clear") == 0) {
+        ConsoleClear();
+    } else {
+        char buf[CONS_COLS+1];
+        kg_strncpy(buf, "comando desconocido: ", CONS_COLS);
+        kg_strncat(buf, cmd, CONS_COLS + 1);
+        ConsoleAddLine(buf);
+    }
+}
+
+static void ConsoleProcessChar(int ch)
+{
+    if (ch == 0xF1) {
+        /* toggle */
+        console_active = !console_active;
+        console_win.visible = console_active;
+        if (console_active) {
+            ConsoleClear();
+            GuiDrawWindow(&console_win);
+            ConsolePrint("Consola activa. Escribe 'help' para ayuda.\n");
+        } else {
+            /* al cerrar, redibujar desktop/taskbar para limpiar */
+            GuiDrawDesktop();
+            GuiDrawTaskbar();
+        }
+        return;
+    }
+    if (!console_active) return;
+
+    if (ch == '\n') {
+        cons_input[cons_input_pos] = '\0';
+        ConsoleAddLine(cons_input);
+        console_execute(cons_input);
+        cons_input_pos = 0;
+        cons_input[0] = '\0';
+    } else if (ch == 0x08) {
+        if (cons_input_pos > 0) {
+            cons_input_pos--;
+            cons_input[cons_input_pos] = '\0';
+            ConsoleRedraw();
+        }
+    } else {
+        if (cons_input_pos < CONS_COLS - 1) {
+            cons_input[cons_input_pos++] = (char)ch;
+            cons_input[cons_input_pos] = '\0';
+            ConsoleRedraw();
+        }
+    }
+}
+
+static void ConsoleProcess(void)
+{
+    int c;
+    while ((c = kbd_getchar()) != -1) {
+        ConsoleProcessChar(c);
+    }
+}
+
+static void ConsoleRedraw(void)
+{
+    /* repinta toda la ventana cuando cambia el contenido */
+    if (!console_active) return;
+    GuiDrawWindow(&console_win);
+    /* historial */
+    for (int i = 0; i < cons_history_count; i++) {
+        int idx = (cons_history_start + i) % CONS_ROWS;
+        int y = console_win.y + TITLEBAR_HEIGHT + BORDER_SIZE + i * FONT_HEIGHT;
+        VgaDrawString(console_win.x + BORDER_SIZE, y, cons_history[idx], VGA_COLOR_BLACK, GUI_COLOR_WINDOW_BG);
+    }
+    /* línea de entrada actual */
+    int y = console_win.y + TITLEBAR_HEIGHT + BORDER_SIZE + cons_history_count * FONT_HEIGHT;
+    /* borra área de entrada */
+    VgaFillRect(console_win.x + BORDER_SIZE, y, CONS_COLS * FONT_WIDTH, FONT_HEIGHT, GUI_COLOR_WINDOW_BG);
+    if (cons_input_pos > 0) {
+        VgaDrawString(console_win.x + BORDER_SIZE, y, cons_input, VGA_COLOR_BLACK, GUI_COLOR_WINDOW_BG);
+    }
+}
+
+/* ---------------------------------------------------------------------
+   sonido de PC speaker
+   --------------------------------------------------------------------- */
+
+/* forward declarations for port I/O helpers (defined later) */
+static inline void outb(uint16_t port, uint8_t val);
+static inline uint8_t inb(uint16_t port);
+
+
+static void pc_speaker_beep(unsigned freq, unsigned ticks)
+{
+    /* configurar PIT canal 2 */
+    unsigned divisor = 1193180 / freq;
+    outb(0x43, 0xB6);
+    outb(0x42, divisor & 0xFF);
+    outb(0x42, divisor >> 8);
+    /* activar speaker */
+    uint8_t tmp = inb(0x61);
+    if ((tmp & 3) != 3) outb(0x61, tmp | 3);
+    /* esperar 'ticks' unidades usando contador de ticks global */
+    uint32_t start = get_tick_count();
+    while ((get_tick_count() - start) < ticks) {
+        /* busy-wait */
+        __asm__ volatile("hlt");
+    }
+    /* desactivar speaker */
+    tmp = inb(0x61) & ~3;
+    outb(0x61, tmp);
+}
+
+static void PlayStartupSound(void)
+{
+    /* tono ascendente breve */
+    pc_speaker_beep(440, 25);
+    pc_speaker_beep(880, 25);
+}
 
 /* serial output available from kernel for debugging */
 extern void serial_puts(const char *s);
@@ -20,8 +295,6 @@ static inline uint8_t inb(uint16_t port) {
     return v;
 }
 
-/* tick counter defined in syscall.c */
-extern uint32_t get_tick_count(void);
 
 /* Leer hora del RTC CMOS (BCD) */
 static uint8_t bcd2bin(uint8_t v) { return (v & 0x0F) + ((v >> 4) * 10); }
@@ -163,6 +436,10 @@ void GuiInit(void)
 {
     g_mouse_head = g_mouse_tail = 0;
     CursorInit();
+    /* keyboard buffer */
+    kbd_head = kbd_tail = 0;
+    /* limpiar consola historia */
+    ConsoleClear();
 }
 
 /* insertar evento en cola; descartar si llena */
@@ -197,7 +474,8 @@ VOID GuiMainLoop(VOID)
     /* inicializaciones comunes */
     GuiInit();
 
-    /* dibujar cursor inicial (respeta bandera visible en ps2mouse) */
+    /* sonar el timbre de inicio y dibujar cursor inicial */
+    PlayStartupSound();
     CursorDraw(prev_x, prev_y);
 
     /* mostrar hora BIOS en taskbar al inicio + fecha */
@@ -365,7 +643,11 @@ VOID GuiMainLoop(VOID)
                     serial_puts("\r\n");
                 }
             }
-            prev_buttons = ms->buttons;
         }
+
+        /* procesar teclado para consola si está abierto o si se presionó F1 */
+        ConsoleProcess();
+
+        prev_buttons = ms->buttons;
     }
 }

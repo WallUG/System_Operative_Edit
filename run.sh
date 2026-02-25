@@ -147,6 +147,7 @@ run_qemu() {
     QEMU_CMD="qemu-system-i386"
     
     # Opciones básicas
+    # Quote ISO path because it may contain spaces
     QEMU_CMD="${QEMU_CMD} -cdrom \"${ISO_PATH}\""
     QEMU_CMD="${QEMU_CMD} -m ${RAM}"
     QEMU_CMD="${QEMU_CMD} -smp ${SMP}"

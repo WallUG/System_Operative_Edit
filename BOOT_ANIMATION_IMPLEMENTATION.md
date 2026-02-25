@@ -262,7 +262,7 @@ This maintains visual consistency from bootloader to kernel.
 - [ ] True color logo (16/24-bit)
 - [ ] Animated logo transitions
 - [ ] Theme system (light/dark modes)
-- [ ] PC speaker boot sound
+- [x] PC speaker boot sound (implemented at GUI startup)
 
 ## Success Criteria Met
 
